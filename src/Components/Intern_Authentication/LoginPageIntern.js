@@ -61,7 +61,7 @@ function LoginIntern(props){
                 </div>
 
                 <div className = "row mt-4">
-                    <form className = "registration-form">
+                    <form className = "registration-form" method = "post" action = "/login">
 
                         <FormElement 
                             labelFor = "emailAddress" 

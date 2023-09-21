@@ -1,7 +1,14 @@
 import React from "react";
-import internshipData from "../../internshipData";
+//import internshipData from "../../internshipData";
+import {Link, useNavigate} from "react-router-dom";
 
 function InternshipCard(){
+
+    const navigate = useNavigate();
+
+    function handleClick(){
+        navigate("/login");
+    }
     return(
         <div className = "internshipCardComponent">
              <h2 className = "heading text-center mt-4">Latest Internships on InternConnect</h2>
@@ -21,7 +28,7 @@ function InternshipCard(){
                                 <p className="card-text">Location</p>
                                 <p className="card-text">Payment</p>
                                 <p className="card-text">Duration</p>
-                                <button className="btn btn-primary mt-4">View Details</button>
+                                <button className="btn btn-primary mt-4" onClick={handleClick}>View Details</button>
                             </div>
                         </div>
                     </div>

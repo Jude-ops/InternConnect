@@ -43,7 +43,12 @@ function RegistrationIntern(){
 
             const response = await axios.post("http://localhost:5000/register/intern", internInfo);
             console.log(response.data);
-            navigate("/");
+            if(response.data === "success"){
+                navigate("/login");
+            }else{
+                alert("Registration failed");
+            }
+
 
         } catch (error) {
 
