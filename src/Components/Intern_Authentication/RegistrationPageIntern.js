@@ -36,18 +36,15 @@ function RegistrationIntern(){
 
     }
 
-  async function handleSubmit(event){
+   async function handleSubmit(event){
+
         event.preventDefault();
         
         try{
 
             const response = await axios.post("http://localhost:5000/register/intern", internInfo);
             console.log(response.data);
-            if(response.data === "success"){
-                navigate("/login");
-            }else{
-                alert("Registration failed");
-            }
+            navigate("/login");
 
 
         } catch (error) {
@@ -248,16 +245,17 @@ function RegistrationIntern(){
                                 onChange = {handleChange}
                                 value = {internInfo.telephone}
                             />
-
+                          
                             <div id = "submitButton" className = "mt-5">
-                                <button type="submit" className ="btn btn-primary" onClick = {handleSubmit}>Sign Up</button>
+                                <button type = "submit" className ="btn btn-primary" onClick = {handleSubmit}>Sign Up</button>
                             </div>
 
                             <div className = "text-center mt-3" style = {{fontSize: "14px"}}>
                                 Already registered? <Link to = "/login" style = {{textDecoration: "none"}}>Login</Link>
                             </div>
-                          
+
                         </form>
+
                 </div>
             </div>
             <Footer />

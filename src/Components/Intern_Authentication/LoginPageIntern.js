@@ -1,9 +1,11 @@
 import React, {useState} from "react";
-import {Link} from "react-router-dom";
+import {Link,useNavigate} from "react-router-dom";
 import FormElement from "../Form_Elements/FormElement";
 import axios from "axios";
 
-function LoginIntern(props){ 
+function LoginIntern(props){   
+
+    const navigate = useNavigate();
 
     const style = {
         color: props.clicked ? "#0B5ED7" : "black",
@@ -34,7 +36,16 @@ function LoginIntern(props){
         try{
 
             const response = await axios.post("http://localhost:5000/login", internLoginInfo);
-            console.log(response.data);
+
+            if(response.data.token){
+
+                const token = response.data.token;
+                localStorage.setItem("token", token);
+                props.setToken(token);
+                navigate("/");
+                //window.location.reload();
+            };
+
 
         } catch(error) {
             console.log('Login error:', error);

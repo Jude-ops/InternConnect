@@ -4,16 +4,18 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 
 const saltRounds = 10;
 const app = express();
 const port = 5000;
+const JWT_SECRET = "internconnect-cameroon";
 
+app.use(cors()); //This is used to allow cross-origin requests
 app.use(bodyParser.urlencoded({extended: true})); //This is used to parse the data from the form
 app.use(bodyParser.json()); //This is used to parse the data from the form
 app.use(express.static("public")); //This is used to serve static files like css, images, etc.
-app.use(cors()); //This is used to allow cross-origin requests
 
 
 let isActive = false;
@@ -24,7 +26,7 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "internconnect"
+    database:"internconnect"
 
 });
 
@@ -41,9 +43,9 @@ db.connect((err) => {
 
 });
 
+//Registering interns into the database
 app.post("/register/intern", (req, res) => {
 
-    console.log(req.body);
     isActive = true;
     const userType = "intern";
 
@@ -56,11 +58,12 @@ app.post("/register/intern", (req, res) => {
             if(err){
 
                 console.log("Error inserting the data into the database!", err);
-                return;
+                return;    
 
             }
 
-            console.log("Intern data inserted successfully!", result);
+            console.log("User data inserted successfully!", result);
+            res.status(200).json({message: "User data inserted successfully!"}); 
 
 
         });
@@ -86,9 +89,10 @@ app.post("/register/intern", (req, res) => {
 
 });
 
+
+//Registering Companies into the database
 app.post("register/company", (req, res) => {
 
-    console.log(req.body);
     isActive = true;
     const userType = "company";
 
@@ -105,7 +109,8 @@ app.post("register/company", (req, res) => {
 
             }
 
-            console.log("Intern data inserted successfully!", result);
+            console.log("User data inserted successfully!", result);
+            res.status(200).json({message: "User data inserted successfully!"});
 
 
         });
@@ -127,9 +132,8 @@ app.post("register/company", (req, res) => {
 
 });
 
+//Login functionality
 app.post("/login", (req,res) => {
-
-    console.log(req.body);
 
     const {emailAddress, password} = req.body;
 
@@ -148,13 +152,14 @@ app.post("/login", (req,res) => {
 
                 if(response){
 
-                    res.send({message: "Login successful!"});
-                    console.log("Login successful!")
+                    console.log("Login successful!");
+                    const token = jwt.sign({userId: result[0].user_ID}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
+                    res.status(200).json({token});
 
                 }else{
 
-                    res.send({message: "Wrong username/password combination!"});
                     console.log("Wrong username/password combination!");
+                    res.send({message: "Wrong username/password combination!"}); 
 
                 }
 
@@ -162,8 +167,9 @@ app.post("/login", (req,res) => {
 
         }else{
 
-            res.send({message: "User doesn't exist!"});
             console.log("User doesn't exist!");
+            res.send({message: "User doesn't exist!"});
+           
 
         }
 

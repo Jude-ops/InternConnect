@@ -1,11 +1,13 @@
 import React, {useState} from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../Homepage/Header";
 import Footer from "../Homepage/Footer";
 import FormElement from "../Form_Elements/FormElement";
 import axios from "axios";
 
 function RegistrationCompany(){
+
+    const navigate = useNavigate();
 
     const [companyInfo, setCompanyInfo] = useState({
 
@@ -39,6 +41,7 @@ function RegistrationCompany(){
 
             const response = await axios.post("http://localhost:5000/register/company", companyInfo);
             console.log(response.data);
+            navigate("/")
 
         } catch (error) {
 

@@ -1,19 +1,40 @@
-import React from "react";
+import React,{useState, useEffect} from "react";
 import './App.css';
-import {BrowserRouter,Routes,Route} from "react-router-dom";
+import {BrowserRouter,Routes,Route, Navigate} from "react-router-dom";
 import RegistrationIntern from "./Components/Intern_Authentication/RegistrationPageIntern";
 import Homepage from "./Components/Homepage/Homepage";
 import LoginPage from "./Components/Login_Page/LoginPage";
 import RegistrationCompany from "./Components/Company_Authentication/RegistrationPageCompany";
 
-function App() {
+ function App() {
+
+  const [token, setToken] = useState("");
+
+
+  useEffect(() => {
+
+    const storedToken = localStorage.getItem('token');
+    if(storedToken){
+      setToken(storedToken);
+    }
+
+  }, [])
+
+    const user = () => {
+
+    return !!token;  // !! converts the value to boolean
+
+  }
+
+  //localStorage.clear();
+
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path = "/" element = {<Homepage />} />
+          <Route path = "/" element = { user() ? <Homepage />: <Navigate to = "/login" /> } />
           <Route path = "/register/intern" element = {<RegistrationIntern />} />
-          <Route path = "/login" element = {<LoginPage />} />
+          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} />} />
           <Route path = "/register/company" element = {<RegistrationCompany />} />
         </Routes>
       </BrowserRouter>
