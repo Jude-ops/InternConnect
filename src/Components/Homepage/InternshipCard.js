@@ -1,11 +1,16 @@
 import React from "react";
 //import internshipData from "../../internshipData";
 
-function InternshipCard(){
+function InternshipCard(props){
 
     return(
         <div className = "internshipCardComponent">
-             <h2 className = "heading text-center mt-4">Latest Internships on InternConnect</h2>
+
+            <h3 className = "text-center fw-bold">Hi {props.storedName}!</h3>
+
+            <h5 className = "text-center text-muted">Let's help you find your internship quickly</h5>
+
+            <h2 className = "heading text-center mt-5">Latest Internships on InternConnect</h2>
 
             <div className="container pt-5">
 

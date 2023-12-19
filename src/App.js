@@ -5,6 +5,8 @@ import RegistrationIntern from "./Components/Intern_Authentication/RegistrationP
 import Homepage from "./Components/Homepage/Homepage";
 import LoginPage from "./Components/Login_Page/LoginPage";
 import RegistrationCompany from "./Components/Company_Authentication/RegistrationPageCompany";
+import UpdateInternInfo from "./Components/Profile_Updates/UpdateInternInfo";
+import UpdateCompanyInfo from "./Components/Profile_Updates/UpdateCompanyInfo";
 
  function App() {
 
@@ -33,9 +35,11 @@ import RegistrationCompany from "./Components/Company_Authentication/Registratio
       <BrowserRouter>
         <Routes>
           <Route path = "/" element = { user() ? <Homepage />: <Navigate to = "/login" /> } />
-          <Route path = "/register/intern" element = {<RegistrationIntern />} />
+          <Route path = "/register/intern" element = {<RegistrationIntern setToken = {setToken} />} />
           <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} />} />
-          <Route path = "/register/company" element = {<RegistrationCompany />} />
+          <Route path = "/register/company" element = {<RegistrationCompany setToken = {setToken} />} />
+          <Route path = "/update/intern/:id" element = {<UpdateInternInfo />} />
+          <Route path = "/update/company/:id" element = {<UpdateCompanyInfo />} />
         </Routes>
       </BrowserRouter>
     </div>

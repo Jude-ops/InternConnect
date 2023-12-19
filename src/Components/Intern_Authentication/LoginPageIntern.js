@@ -43,7 +43,7 @@ function LoginIntern(props){
                 localStorage.setItem("token", token);
                 props.setToken(token);
                 navigate("/");
-                //window.location.reload();
+
             };
 
 

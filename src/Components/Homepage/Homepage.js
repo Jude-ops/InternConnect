@@ -3,12 +3,12 @@ import Header from "./Header";
 import Footer from "./Footer";
 import InternshipCard from "./InternshipCard";
 
-function Homepage(){
+function Homepage(props){
 
     return(
         <div>
             <Header />
-            <InternshipCard />
+            <InternshipCard storedName = {props.storedValue}/>
             <Footer />
         </div>
     )

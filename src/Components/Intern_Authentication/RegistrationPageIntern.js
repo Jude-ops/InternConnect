@@ -5,7 +5,7 @@ import {Link,useNavigate} from "react-router-dom";
 import FormElement from "../Form_Elements/FormElement";
 import axios from "axios";
 
-function RegistrationIntern(){
+function RegistrationIntern(props){
 
     const navigate = useNavigate();
 
@@ -43,8 +43,15 @@ function RegistrationIntern(){
         try{
 
             const response = await axios.post("http://localhost:5000/register/intern", internInfo);
-            console.log(response.data);
-            navigate("/login");
+
+            if(response.data.token){
+
+                const token = response.data.token;
+                localStorage.setItem("token", token);
+                props.setToken(token);
+                navigate("/");
+
+            };
 
 
         } catch (error) {
@@ -73,6 +80,7 @@ function RegistrationIntern(){
                                         labelTitle = "First Name"
                                         onChange = {handleChange}
                                         value = {internInfo.firstName}
+                                        storedValue = {internInfo.firstName}
                                     />
                                 </div>
 

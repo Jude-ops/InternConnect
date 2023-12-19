@@ -5,7 +5,7 @@ import Footer from "../Homepage/Footer";
 import FormElement from "../Form_Elements/FormElement";
 import axios from "axios";
 
-function RegistrationCompany(){
+function RegistrationCompany(props){
 
     const navigate = useNavigate();
 
@@ -40,8 +40,15 @@ function RegistrationCompany(){
         try{
 
             const response = await axios.post("http://localhost:5000/register/company", companyInfo);
-            console.log(response.data);
-            navigate("/")
+            
+            if(response.data.token){
+
+                const token = response.data.token;
+                localStorage.setItem("token", token);
+                props.setToken(token);
+                navigate("/");
+
+            };
 
         } catch (error) {
 

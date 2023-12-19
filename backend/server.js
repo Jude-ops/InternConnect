@@ -32,12 +32,14 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
 
-    console.log("Successfully connected to the database!");
-
     if(err){
 
         console.log("Error connecting to the database!", err);
         return;
+
+    } else{
+
+        console.log("Successfully connected to the database!");
 
     }
 
@@ -63,7 +65,8 @@ app.post("/register/intern", (req, res) => {
             }
 
             console.log("User data inserted successfully!", result);
-            res.status(200).json({message: "User data inserted successfully!"}); 
+            const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
+            res.status(200).json({token}); 
 
 
         });
@@ -110,10 +113,12 @@ app.post("register/company", (req, res) => {
             }
 
             console.log("User data inserted successfully!", result);
-            res.status(200).json({message: "User data inserted successfully!"});
+            const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
+            res.status(200).json({token});
 
 
         });
+
 
         db.query('INSERT INTO companies (company_name,company_email,password,location_city,address,telephone,is_Active) VALUES (?,?,?,?,?,?,?) ', [fullName, emailAddress, hash, location, address, parseInt(telephone), isActive], (err, result) => {
             
@@ -145,7 +150,7 @@ app.post("/login", (req,res) => {
             return;
 
         }
-
+        console.log(result)
         if(result.length > 0){
 
             bcrypt.compare(password, result[0].password, (error, response) => {
@@ -177,6 +182,89 @@ app.post("/login", (req,res) => {
 
 });
 
+//Update intern information
+app.put("/update/intern/:id", (req, res) => {
+
+    const id = req.params.id;
+    const q = "UPDATE interns SET `email_address` = ?, `password` = ?, `location` = ?, `address` = ?, `telephone` = ? WHERE intern_ID = ?";
+    const {emailAddress, password, location, address, telephone} = req.body;
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+
+        const data = [emailAddress, hash, location, address, parseInt(telephone)];
+    
+        db.query(q, [...data, id], (err, result) => {
+
+            if(err){
+
+                console.log("Error updating the data in the database!", err);
+                return;
+
+            }
+
+            console.log("Intern data updated successfully!", result);
+            res.send({message: "Intern data updated successfully!"});
+
+        });
+
+        db.query('UPDATE users SET `email` = ?, `password` = ? WHERE user_ID = ?', [emailAddress, hash, id], (err, result) => {
+
+            if(err){
+
+                console.log("Error updating the data in the database!", err);
+                return;
+
+            }
+
+            console.log("User data updated successfully!", result);
+            res.send({message: "User data updated successfully!"});
+
+        });
+
+    });
+
+});
+
+//Update company information
+app.put("/update/company/:id", (req, res) => {
+
+    const id = req.params.id;
+    const q = "UPDATE companies SET `company_email` = ?, `password` = ?, `telephone` = ? WHERE company_ID = ?";
+    const {emailAddress, password, telephone} = req.body;
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+
+        const data = [emailAddress, hash, parseInt(telephone)];
+    
+        db.query(q, [...data, id], (err, result) => {
+
+            if(err){
+
+                console.log("Error updating the data in the database!", err);
+                return;
+
+            }
+
+            console.log("Company data updated successfully!", result);
+            res.send({message: "Company data updated successfully!"});
+
+        });
+
+        db.query('UPDATE users SET `email` = ?, `password` = ? WHERE user_ID = ?', [emailAddress, hash, id], (err, result) => {
+
+            if(err){
+
+                console.log("Error updating the data in the database!", err);
+                return;
+
+            }
+
+            console.log("User data updated successfully!", result);
+            res.send({message: "User data updated successfully!"});
+
+        });
+
+    });
+
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}...`);
