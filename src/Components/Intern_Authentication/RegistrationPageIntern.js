@@ -64,7 +64,7 @@ function RegistrationIntern(props){
 
     return(
         <div>
-            <Header />
+            <Header isAuthenticated = {props.isAuthenticated} />
             <div className = "container my-5 mx-auto p-3" style = {{width:"480px"}}>
                 <h3 className = "text-center fw-bold h3-responsive">Sign-up and apply for free on InternConnect!</h3>
                 <div className = "row mt-4">

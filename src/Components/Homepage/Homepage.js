@@ -7,7 +7,7 @@ function Homepage(props){
 
     return(
         <div>
-            <Header />
+            <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
             <InternshipCard storedName = {props.storedValue}/>
             <Footer />
         </div>

@@ -35,12 +35,14 @@ function RegistrationCompany(props){
     }
 
     async function handleSubmit(event){
+
         event.preventDefault();
 
         try{
 
             const response = await axios.post("http://localhost:5000/register/company", companyInfo);
-            
+            console.log(response);
+
             if(response.data.token){
 
                 const token = response.data.token;
@@ -60,7 +62,7 @@ function RegistrationCompany(props){
 
     return(
         <div>
-             <Header />
+             <Header isAuthenticated = {props.isAuthenticated} />
             <div className = "container my-5 p-3" style = {{width:"480px"}}>
                 <h3 className = "text-center fw-bold h3-responsive">Hire interns and freshers faster on InternConnect! </h3>
                 <div className = "row mt-4">

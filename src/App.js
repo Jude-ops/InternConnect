@@ -14,7 +14,8 @@ import UpdateCompanyInfo from "./Components/Profile_Updates/UpdateCompanyInfo";
 
 
   useEffect(() => {
-
+    
+    // Check if token is stored in localStorage when the app loads
     const storedToken = localStorage.getItem('token');
     if(storedToken){
       setToken(storedToken);
@@ -28,18 +29,23 @@ import UpdateCompanyInfo from "./Components/Profile_Updates/UpdateCompanyInfo";
 
   }
 
-  //localStorage.clear();
+const logout = () => {
+
+    localStorage.removeItem("token");
+    setToken("");
+
+};
 
   return (
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path = "/" element = { user() ? <Homepage />: <Navigate to = "/login" /> } />
-          <Route path = "/register/intern" element = {<RegistrationIntern setToken = {setToken} />} />
-          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} />} />
-          <Route path = "/register/company" element = {<RegistrationCompany setToken = {setToken} />} />
-          <Route path = "/update/intern/:id" element = {<UpdateInternInfo />} />
-          <Route path = "/update/company/:id" element = {<UpdateCompanyInfo />} />
+          <Route path = "/" element = { user() ? <Homepage isAuthenticated = {user} logout = {logout}/>: <Navigate to = "/login" /> } />
+          <Route path = "/register/intern" element = {<RegistrationIntern isAuthenticated = {user} setToken = {setToken} />} />
+          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} isAuthenticated = {user}/>} />
+          <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} />} />
+          <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} />} />
+          <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} />} />
         </Routes>
       </BrowserRouter>
     </div>

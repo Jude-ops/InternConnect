@@ -12,10 +12,38 @@ const app = express();
 const port = 5000;
 const JWT_SECRET = "internconnect-cameroon";
 
+
 app.use(cors()); //This is used to allow cross-origin requests
 app.use(bodyParser.urlencoded({extended: true})); //This is used to parse the data from the form
 app.use(bodyParser.json()); //This is used to parse the data from the form
 app.use(express.static("public")); //This is used to serve static files like css, images, etc.
+
+
+
+// Middleware to verify the token and decode it
+const verifyToken = (req, res, next) => {
+    const token = req.header('Authorization');
+  
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized, token not found.' });
+    }
+  
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.userId = decoded.userId; // Attach the decoded user ID to the request
+      next();
+    } catch (error) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+  };
+  
+  
+  // A protected route that requires the token
+  app.get('/protected', verifyToken, (req, res) => {
+    // Access the decoded user ID from the request
+    const userId = req.userId;
+    res.json({ message: 'Access granted!', userId });
+  });
 
 
 let isActive = false;
@@ -66,7 +94,7 @@ app.post("/register/intern", (req, res) => {
 
             console.log("User data inserted successfully!", result);
             const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-            res.status(200).json({token}); 
+            res.status(200).json({token, userType}); 
 
 
         });
@@ -94,7 +122,7 @@ app.post("/register/intern", (req, res) => {
 
 
 //Registering Companies into the database
-app.post("register/company", (req, res) => {
+app.post("/register/company", (req, res) => {
 
     isActive = true;
     const userType = "company";
@@ -114,7 +142,7 @@ app.post("register/company", (req, res) => {
 
             console.log("User data inserted successfully!", result);
             const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-            res.status(200).json({token});
+            res.status(200).json({token, userType});
 
 
         });
@@ -159,7 +187,7 @@ app.post("/login", (req,res) => {
 
                     console.log("Login successful!");
                     const token = jwt.sign({userId: result[0].user_ID}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                    res.status(200).json({token});
+                    res.status(200).json({token, userType: result[0].user_type});
 
                 }else{
 
@@ -216,7 +244,7 @@ app.put("/update/intern/:id", (req, res) => {
             }
 
             console.log("User data updated successfully!", result);
-            res.send({message: "User data updated successfully!"});
+            
 
         });
 
@@ -258,9 +286,137 @@ app.put("/update/company/:id", (req, res) => {
             }
 
             console.log("User data updated successfully!", result);
-            res.send({message: "User data updated successfully!"});
+        
 
         });
+
+    });
+
+});
+
+//Delete intern information
+app.patch("/delete/intern/:id", (req, res) => {
+
+    const id = req.params.id;
+    const q = "UPDATE interns SET `is_Active` = ? WHERE intern_ID = ?";
+    const data = [false, id];
+
+    db.query(q, data, (err, result) => {
+
+        if(err){
+
+            console.log("Error deleting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Intern data deleted successfully!", result);
+        res.send({message: "Intern data deleted successfully!"});
+
+    });
+
+    db.query('UPDATE users SET `is_Active` = ? WHERE user_ID = ?', [false, id], (err, result) => {
+
+        if(err){
+
+            console.log("Error deleting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("User data deleted successfully!", result);
+    
+
+    });
+
+});
+
+//Delete company information
+app.patch("/delete/company/:id", (req, res) => {
+
+    const id = req.params.id;
+    const q = "UPDATE companies SET `is_Active` = ? WHERE company_ID = ?";
+    const data = [false, id];
+
+    db.query(q, data, (err, result) => {
+
+        if(err){
+
+            console.log("Error deleting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Company data deleted successfully!", result);
+        res.send({message: "Company data deleted successfully!"});
+
+    });
+
+    db.query('UPDATE users SET `is_Active` = ? WHERE user_ID = ?', [false, id], (err, result) => {
+
+        if(err){
+
+            console.log("Error deleting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("User data deleted successfully!", result);
+       
+
+    });
+
+});
+
+app.post("/internships", (req,res) => {
+
+    const {companyName, internshipTitle, internshipDescription, internshipLocation, internshipStartDate, internshipEndDate, internshipStatus} = req.body;
+
+    // First, get the companyID from the companies table
+    db.query('SELECT id FROM companies WHERE name = ?', [companyName], (err, result) => {
+        if(err){
+            console.log("Error fetching company ID!", err);
+            return;
+        }
+
+        if(result.length > 0){
+            const companyID = result[0].id;
+
+            // Then, insert the new internship with the companyID
+            const q = 'INSERT INTO internships (internship_name, company_ID, internship_description, location_city, start_date, end_date, internship_status) VALUES (?,?,?,?,?,?,?) ';
+            const data = [internshipTitle, companyID, internshipDescription, internshipLocation, internshipStartDate, internshipEndDate, internshipStatus];
+            db.query(q, data, (err, result) => {
+
+                if(err){
+                    console.log("Error inserting the internship data into the database!", err);
+                    return;
+                }
+
+                console.log("Internship data inserted successfully!", result);
+                res.send({message: "Internship data inserted successfully!"});
+
+            });
+        } else {
+            console.log("Company not found!");
+            res.send({message: "Company not found!"});
+        }
+    });
+});
+
+
+app.get("/internships", (req,res) => {
+
+    db.query('SELECT * FROM internships', (err, result) => {
+
+        if(err){
+
+            console.log("Error selecting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Internship data selected successfully!", result);
+        return res.json(result);
 
     });
 

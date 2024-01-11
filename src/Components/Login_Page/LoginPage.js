@@ -4,7 +4,7 @@ import Footer from "../Homepage/Footer";
 import LoginCompany from "../Company_Authentication/LoginPageCompany";
 import LoginIntern from "../Intern_Authentication/LoginPageIntern";
 
-function LoginPage({setToken}){
+function LoginPage({setToken, isAuthenticated}){
 
     const [isIntern,setForm] = useState(true);
     const [isClicked,setClick]  = useState(true);
@@ -20,7 +20,7 @@ function LoginPage({setToken}){
 
     return(
         <div>
-            <Header />
+            <Header isAuthenticated = {isAuthenticated} />
             {isIntern ? 
                 <LoginIntern 
                     onCompany = {displayCompanyForm} 
