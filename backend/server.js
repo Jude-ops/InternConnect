@@ -83,22 +83,6 @@ app.post("/register/intern", (req, res) => {
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-         db.query('INSERT INTO users (username,email,password,user_type,is_Active) VALUES (?,?,?,?,?) ', [firstName.concat(lastName),emailAddress,hash,userType,isActive], (err, result) => {
-
-            if(err){
-
-                console.log("Error inserting the data into the database!", err);
-                return;    
-
-            }
-
-            console.log("User data inserted successfully!", result);
-            const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-            res.status(200).json({token, userType}); 
-
-
-        });
-
         db.query('INSERT INTO interns (first_name,last_name,date_of_birth,email_address,password,location,address,school,department,gender,telephone,is_Active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, emailAddress,hash,location, address, school, department,gender,parseInt(telephone),isActive], (err, result) => {
 
             if(err){
@@ -110,13 +94,27 @@ app.post("/register/intern", (req, res) => {
 
             console.log("Intern data inserted successfully!", result);
 
+            // Get the internID of the newly inserted intern
+            const internID = result.insertId;
 
-        });
-        
+            db.query('INSERT INTO users (username,email,password,user_type,is_Active,intern_ID) VALUES (?,?,?,?,?,?) ', [firstName.concat(lastName),emailAddress,hash,userType,isActive,internID], (err, result) => {
 
-    });
-
+                if(err){
     
+                    console.log("Error inserting the data into the database!", err);
+                    return;    
+    
+                }
+    
+                console.log("User data inserted successfully!", result);
+                const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
+                res.status(200).json({token, userType}); 
+    
+            });
+
+        });      
+        
+    });
 
 });
 
@@ -131,23 +129,6 @@ app.post("/register/company", (req, res) => {
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-         db.query('INSERT INTO users (username,email,password,user_type,is_Active) VALUES (?,?,?,?,?) ', [fullName,emailAddress,hash,userType,isActive], (err, result) => {
-
-            if(err){
-
-                console.log("Error inserting the data into the database!", err);
-                return;
-
-            }
-
-            console.log("User data inserted successfully!", result);
-            const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-            res.status(200).json({token, userType});
-
-
-        });
-
-
         db.query('INSERT INTO companies (company_name,company_email,password,location_city,address,telephone,is_Active) VALUES (?,?,?,?,?,?,?) ', [fullName, emailAddress, hash, location, address, parseInt(telephone), isActive], (err, result) => {
             
             if(err){
@@ -158,6 +139,24 @@ app.post("/register/company", (req, res) => {
             }
 
             console.log("Company data inserted successfully!", result);
+
+            // Get the companyID of the newly inserted company
+            const companyID = result.insertId;
+
+            db.query('INSERT INTO users (username,email,password,user_type,is_Active,company_ID) VALUES (?,?,?,?,?,?) ', [fullName,emailAddress,hash,userType,isActive,companyID], (err, result) => {
+
+                if(err){
+    
+                    console.log("Error inserting the data into the database!", err);
+                    return;
+    
+                }
+    
+                console.log("User data inserted successfully!", result);
+                const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
+                res.status(200).json({token, userType});
+    
+            });
 
         });
 
@@ -178,7 +177,7 @@ app.post("/login", (req,res) => {
             return;
 
         }
-        console.log(result)
+
         if(result.length > 0){
 
             bcrypt.compare(password, result[0].password, (error, response) => {
@@ -214,41 +213,62 @@ app.post("/login", (req,res) => {
 app.put("/update/intern/:id", (req, res) => {
 
     const id = req.params.id;
-    const q = "UPDATE interns SET `email_address` = ?, `password` = ?, `location` = ?, `address` = ?, `telephone` = ? WHERE intern_ID = ?";
     const {emailAddress, password, location, address, telephone} = req.body;
-    bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        const data = [emailAddress, hash, location, address, parseInt(telephone)];
-    
-        db.query(q, [...data, id], (err, result) => {
+    // First, get the intern_ID from the users table
 
-            if(err){
+    db.query('SELECT intern_ID FROM users WHERE user_ID = ?', [id], (err, result) => {
 
-                console.log("Error updating the data in the database!", err);
-                return;
+        if(err){
 
-            }
+            console.log("Error fetching intern ID from the database!", err);
+            return res.status(500).json({ message: 'Error fetching intern ID from the database' });
 
-            console.log("Intern data updated successfully!", result);
-            res.send({message: "Intern data updated successfully!"});
+        }
 
-        });
+        if(result.length > 0){
 
-        db.query('UPDATE users SET `email` = ?, `password` = ? WHERE user_ID = ?', [emailAddress, hash, id], (err, result) => {
+            const internID = result[0].intern_ID;
 
-            if(err){
+            // Then, update the intern information
+            bcrypt.hash(password, saltRounds, (err, hash) => {
 
-                console.log("Error updating the data in the database!", err);
-                return;
-
-            }
-
-            console.log("User data updated successfully!", result);
+                const data = [emailAddress, hash, location, address, parseInt(telephone)];
             
+                db.query('UPDATE interns SET `email_address` = ?, `password` = ?, `location` = ?, `address` = ?, `telephone` = ? WHERE intern_ID = ?', [...data, internID], (err, result) => {
+        
+                    if(err){
+        
+                        console.log("Error updating the data in the database!", err);
+                        return;
+        
+                    }
+        
+                    console.log("Intern data updated successfully!", result);
+                    res.send({message: "Intern data updated successfully!"});
+        
+                });
+        
+                db.query('UPDATE users SET `email` = ?, `password` = ? WHERE user_ID = ?', [emailAddress, hash, id], (err, result) => {
+        
+                    if(err){
+        
+                        console.log("Error updating the data in the database!", err);
+                        return;
+        
+                    }
+        
+                    console.log("User data updated successfully!", result);
+                    
+        
+                });
+        
+            });
 
-        });
+        }
 
     });
+
 
 });
 
@@ -256,41 +276,61 @@ app.put("/update/intern/:id", (req, res) => {
 app.put("/update/company/:id", (req, res) => {
 
     const id = req.params.id;
-    const q = "UPDATE companies SET `company_email` = ?, `password` = ?, `telephone` = ? WHERE company_ID = ?";
     const {emailAddress, password, telephone} = req.body;
-    bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        const data = [emailAddress, hash, parseInt(telephone)];
-    
-        db.query(q, [...data, id], (err, result) => {
+    // First, get the company_ID from the users table
+    db.query('SELECT company_ID FROM users WHERE user_ID = ?', [id], (err, result) => {
 
-            if(err){
+        if (err) {
+        console.log("Error fetching company ID from the database!", err);
+        return res.status(500).json({ message: 'Error fetching company ID from the database' });
+        }
 
-                console.log("Error updating the data in the database!", err);
-                return;
+        if (result.length > 0) {
 
-            }
+            const companyID = result[0].company_ID;
 
-            console.log("Company data updated successfully!", result);
-            res.send({message: "Company data updated successfully!"});
+            // Then, update the company information
+            bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        });
-
-        db.query('UPDATE users SET `email` = ?, `password` = ? WHERE user_ID = ?', [emailAddress, hash, id], (err, result) => {
-
-            if(err){
-
-                console.log("Error updating the data in the database!", err);
-                return;
-
-            }
-
-            console.log("User data updated successfully!", result);
+                const data = [emailAddress, hash, parseInt(telephone)];
+            
+                db.query('UPDATE companies SET `company_email` = ?, `password` = ?, `telephone` = ? WHERE company_ID = ?', [...data, companyID], (err, result) => {
         
+                    if(err){
+        
+                        console.log("Error updating the data in the database!", err);
+                        return;
+        
+                    }
+        
+                    console.log("Company data updated successfully!", result);
+                    res.send({message: "Company data updated successfully!"});
+        
+                });
+        
+                db.query('UPDATE users SET `email` = ?, `password` = ? WHERE user_ID = ?', [emailAddress, hash, id], (err, result) => {
+        
+                    if(err){
+        
+                        console.log("Error updating the data in the database!", err);
+                        return;
+        
+                    }
+        
+                    console.log("User data updated successfully!", result);
+                
+        
+                });
+        
+            });    
 
-        });
+        }
 
     });
+
+
+    
 
 });
 
@@ -325,7 +365,7 @@ app.patch("/delete/intern/:id", (req, res) => {
         }
 
         console.log("User data deleted successfully!", result);
-    
+        
 
     });
 

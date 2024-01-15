@@ -43,14 +43,20 @@ function RegistrationCompany(props){
             const response = await axios.post("http://localhost:5000/register/company", companyInfo);
             console.log(response);
 
-            if(response.data.token){
+            if(response){
 
                 const token = response.data.token;
                 localStorage.setItem("token", token);
                 props.setToken(token);
+
+                const userType = response.data.userType;
+                localStorage.setItem("userType", userType);
+                props.setUserType(userType);
+                
                 navigate("/");
 
             };
+
 
         } catch (error) {
 

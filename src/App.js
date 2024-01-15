@@ -11,6 +11,7 @@ import UpdateCompanyInfo from "./Components/Profile_Updates/UpdateCompanyInfo";
  function App() {
 
   const [token, setToken] = useState("");
+  const [userType, setUserType] = useState("");
 
 
   useEffect(() => {
@@ -19,6 +20,11 @@ import UpdateCompanyInfo from "./Components/Profile_Updates/UpdateCompanyInfo";
     const storedToken = localStorage.getItem('token');
     if(storedToken){
       setToken(storedToken);
+    }
+
+    const storedUserType = localStorage.getItem('userType');
+    if(storedUserType){
+      setUserType(storedUserType);
     }
 
   }, [])
@@ -33,6 +39,8 @@ const logout = () => {
 
     localStorage.removeItem("token");
     setToken("");
+    localStorage.removeItem("userType");
+    setUserType("");
 
 };
 
@@ -41,9 +49,9 @@ const logout = () => {
       <BrowserRouter>
         <Routes>
           <Route path = "/" element = { user() ? <Homepage isAuthenticated = {user} logout = {logout}/>: <Navigate to = "/login" /> } />
-          <Route path = "/register/intern" element = {<RegistrationIntern isAuthenticated = {user} setToken = {setToken} />} />
-          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} isAuthenticated = {user}/>} />
-          <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} />} />
+          <Route path = "/register/intern" element = {<RegistrationIntern isAuthenticated = {user} setToken = {setToken}  setUserType = {setUserType} />} />
+          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} isAuthenticated = {user} setUserType = {setUserType} />} />
+          <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} setUserType = {setUserType} />} />
           <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} />} />
           <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} />} />
         </Routes>

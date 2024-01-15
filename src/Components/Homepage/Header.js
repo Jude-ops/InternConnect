@@ -5,10 +5,12 @@ import axios from "axios";
 function Header(props){
 
     const [userId, setUserId] = useState(null);
+    const [userType, setUserType] = useState(null);
 
     useEffect(() => {
 
         const token = localStorage.getItem("token");
+        const userType = localStorage.getItem("userType");
 
         async function fetchUserId(){
 
@@ -21,6 +23,7 @@ function Header(props){
 
                 const {userId} = response.data;
                 setUserId(userId)
+                setUserType(userType);
 
             } catch (error) {
                 console.log('Error fetching user data:', error);
@@ -65,7 +68,7 @@ function Header(props){
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="/">Home</a></li>
                                         <li><a class="dropdown-item" href="/intern/applications">My Applications</a></li>
-                                        <li><a class="dropdown-item" href = {`/update/user/${userId}`}>Edit Profile</a></li>
+                                        <li><a class="dropdown-item" href = {`/update/${userType}/${userId}`}>Edit Profile</a></li>
                                         <li><a class="dropdown-item" href="/" onClick={() => {props.logout()}}>Logout</a></li>
                                     </ul>
                                 </div>
