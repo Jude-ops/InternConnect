@@ -335,74 +335,128 @@ app.put("/update/company/:id", (req, res) => {
 });
 
 //Delete intern information
-app.patch("/delete/intern/:id", (req, res) => {
+app.delete("/delete/intern/:id", (req, res) => {
 
     const id = req.params.id;
-    const q = "UPDATE interns SET `is_Active` = ? WHERE intern_ID = ?";
-    const data = [false, id];
-
-    db.query(q, data, (err, result) => {
+    
+    db.query('SELECT intern_ID FROM users WHERE user_ID = ?', [id], (err, result) => {
 
         if(err){
 
-            console.log("Error deleting the data from the database!", err);
-            return;
+        console.log("Error fetching intern ID from the database!", err);
+        return res.status(500).json({ message: 'Error fetching intern ID from the database' });
 
         }
 
-        console.log("Intern data deleted successfully!", result);
-        res.send({message: "Intern data deleted successfully!"});
+        if(result.length > 0){
 
-    });
+            const internID = result[0].intern_ID;
 
-    db.query('UPDATE users SET `is_Active` = ? WHERE user_ID = ?', [false, id], (err, result) => {
+            db.query('DELETE FROM interns WHERE intern_ID = ?', [internID], (err, result) => {
 
-        if(err){
+                if(err){
 
-            console.log("Error deleting the data from the database!", err);
-            return;
+                    console.log("Error deleting the data from the database!", err);
+                    return;
+
+                }
+
+                console.log("Intern data deleted successfully!", result);
+                res.send({message: "Intern data deleted successfully!"});
+
+            });
+
+            db.query('DELETE FROM users WHERE user_ID = ?', [id], (err, result) => {
+
+                if(err){
+
+                    console.log("Error deleting the data from the database!", err);
+                    return;
+
+                }
+
+                console.log("User data deleted successfully!", result);
+
+            });
+
+            db.query('DELETE FROM applications WHERE intern_ID = ?', [internID], (err, result) => {
+
+                if(err){
+
+                    console.log("Error deleting the data from the database!", err);
+                    return;
+
+                }
+
+                console.log("Application data deleted successfully!", result);
+
+            });
 
         }
-
-        console.log("User data deleted successfully!", result);
-        
 
     });
 
 });
 
 //Delete company information
-app.patch("/delete/company/:id", (req, res) => {
+app.delete("/delete/company/:id", (req, res) => {
 
     const id = req.params.id;
-    const q = "UPDATE companies SET `is_Active` = ? WHERE company_ID = ?";
-    const data = [false, id];
 
-    db.query(q, data, (err, result) => {
+    db.query('SELECT company_ID FROM users WHERE user_ID = ?', [id], (err, result) => {
 
         if(err){
 
-            console.log("Error deleting the data from the database!", err);
-            return;
+        console.log("Error fetching company ID from the database!", err);
+        return res.status(500).json({ message: 'Error fetching company ID from the database' });
 
         }
 
-        console.log("Company data deleted successfully!", result);
-        res.send({message: "Company data deleted successfully!"});
+        if(result.length > 0){
 
-    });
+           const companyID = result[0].company_ID;
 
-    db.query('UPDATE users SET `is_Active` = ? WHERE user_ID = ?', [false, id], (err, result) => {
+           db.query('DELETE FROM internships WHERE company_ID = ?', [companyID], (err, result) => {
 
-        if(err){
+                if(err){
 
-            console.log("Error deleting the data from the database!", err);
-            return;
+                    console.log("Error deleting the data from the database!", err);
+                    return;
+
+                }
+
+                console.log("Internship data deleted successfully!", result);
+
+           });
+
+           db.query('DELETE FROM companies WHERE company_ID = ?', [companyID], (err, result) => {
+
+                if(err){
+
+                    console.log("Error deleting the data from the database!", err);
+                    return;
+
+                }
+
+                console.log("Company data deleted successfully!", result);
+                res.send({message: "Company data deleted successfully!"});
+
+           });
+
+           db.query('DELETE FROM users WHERE user_ID = ?', [id], (err, result) => {
+
+                if(err){
+
+                    console.log("Error deleting the data from the database!", err);
+                    return;
+
+                }
+
+                console.log("User data deleted successfully!", result);
+
+           });
 
         }
-
-        console.log("User data deleted successfully!", result);
-       
 
     });
 

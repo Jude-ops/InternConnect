@@ -53,6 +53,31 @@ function UpdateCompanyInfo(props){
 
     };
 
+    async function handleDelete(){
+
+        try{
+
+            const response = await axios.delete("http://localhost:5000/delete/company/" + id);
+
+            if(response){
+
+                localStorage.removeItem("token");
+                props.setToken("");
+                localStorage.removeItem("userType");
+                props.setUserType("");
+
+                navigate("/");
+
+            }
+
+        } catch (error) {
+
+            console.error("Error deleting company account:", error);
+
+        }
+
+    }
+
     return (
         <div>
             <Header isAuthenticated = {props.isAuthenticated}/>
@@ -113,6 +138,31 @@ function UpdateCompanyInfo(props){
                         </div>
 
                     </form>
+
+                    <div className = "col-12 text-center mt-5">
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        Delete Account
+                        </button>
+
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header text-center">
+                                        <h1 class="modal-title w-100 fs-5" id="exampleModalLabel">Delete Account</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete your account?<br />
+                                        This action cannot be reversed!
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-danger" onClick={handleDelete}>Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             </div>
