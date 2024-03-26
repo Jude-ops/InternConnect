@@ -7,6 +7,8 @@ import LoginPage from "./Components/Login_Page/LoginPage";
 import RegistrationCompany from "./Components/Company_Authentication/RegistrationPageCompany";
 import UpdateInternInfo from "./Components/Profile_Updates/UpdateInternInfo";
 import UpdateCompanyInfo from "./Components/Profile_Updates/UpdateCompanyInfo";
+import PostInternship from "./Components/Internship_Handling/PostInternship";
+import InternshipDetails from "./Components/Internship_Handling/InternshipDetails";
 
  function App() {
 
@@ -54,6 +56,8 @@ const logout = () => {
           <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} setUserType = {setUserType} />} />
           <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} />} />
           <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} />} />
+          <Route path = "/post_internship" element = { user() && <PostInternship isAuthenticated = {user}/>} />
+          <Route path = "/internship/:id" element = {<InternshipDetails isAuthenticated = {user}/>} />
         </Routes>
       </BrowserRouter>
     </div>

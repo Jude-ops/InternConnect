@@ -14,7 +14,7 @@ header {
 }
 
 .internshipCardComponent{
-    margin: 50px 0 !important;
+    margin: 50px 0 50px 0!important;
 }
 
 .internshipCardComponent .card{
@@ -68,4 +68,54 @@ footer ul span, header ul span{
 
 input[type="text"], input[type="password"], input[type="email"]{
     font-size: 15px;
+}
+
+.internshipCardComponent .card img{
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.internship-details{  
+    border: none;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow:0px 0px 6px 0px rgba(0,0,0,0.5);
+}
+
+.internship-key-details{
+    width: 60%;
+}
+
+.internship-overview{
+    width: 30%;
+    padding: 30px;
+    border: 1px solid #EEEFF1;
+}
+
+.internship-title-box{
+    padding: 18px;
+    border: 1px solid #EEEFF1;
+    height: auto;
+}
+
+.logo{
+    width: 65px;
+    height: 62.5px;
+    border: 1px solid #EEEFF1;
+}
+
+.internship-title{
+    margin-left: 20px;
+    height: auto;
+}
+
+.icon{
+    width:70px;
+    height: 70px;
+    border: 1px solid #EEEFF1;
+}
+
+.skill-required, .perks-internship{
+    padding: 10px !important;
 }

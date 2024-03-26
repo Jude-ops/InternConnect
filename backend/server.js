@@ -125,11 +125,11 @@ app.post("/register/company", (req, res) => {
     isActive = true;
     const userType = "company";
 
-    const {fullName, emailAddress, password, location, address, telephone} = req.body;
+    const {fullName, emailAddress, password, location, address, telephone, description} = req.body;
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        db.query('INSERT INTO companies (company_name,company_email,password,location_city,address,telephone,is_Active) VALUES (?,?,?,?,?,?,?) ', [fullName, emailAddress, hash, location, address, parseInt(telephone), isActive], (err, result) => {
+        db.query('INSERT INTO companies (company_name,company_email,password,location_city,address,telephone,is_Active, company_description) VALUES (?,?,?,?,?,?,?.?) ', [fullName, emailAddress, hash, location, address, parseInt(telephone), isActive, description], (err, result) => {
             
             if(err){
 
@@ -464,21 +464,54 @@ app.delete("/delete/company/:id", (req, res) => {
 
 app.post("/internships", (req,res) => {
 
-    const {companyName, internshipTitle, internshipDescription, internshipLocation, internshipStartDate, internshipEndDate, internshipStatus} = req.body;
+    const {
+        companyName, 
+        internshipTitle, 
+        internshipDescription, 
+        internshipLocation, 
+        internshipStartDate, 
+        internshipEndDate, 
+        internshipStatus,
+        category,
+        applyBy,
+        availablePositions,
+        whoCanApply,
+        perksOfInternship,
+        skillsRequired
+    } = req.body;
 
     // First, get the companyID from the companies table
-    db.query('SELECT id FROM companies WHERE name = ?', [companyName], (err, result) => {
+    db.query('SELECT company_ID, company_description FROM companies WHERE company_name = ?', [companyName], (err, result) => {
         if(err){
             console.log("Error fetching company ID!", err);
             return;
         }
 
         if(result.length > 0){
-            const companyID = result[0].id;
+            
+            const companyID = result[0].company_ID;
+            const companyDescription = result[0].company_description;
 
             // Then, insert the new internship with the companyID
-            const q = 'INSERT INTO internships (internship_name, company_ID, internship_description, location_city, start_date, end_date, internship_status) VALUES (?,?,?,?,?,?,?) ';
-            const data = [internshipTitle, companyID, internshipDescription, internshipLocation, internshipStartDate, internshipEndDate, internshipStatus];
+            const q = 'INSERT INTO internships (internship_name, company_ID, internship_description, location_city, start_date, end_date, internship_status, company_Name, company_description, posted_On, category, apply_by, available_positions, who_can_apply, perks, skills_required) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ';
+            const data = [
+                internshipTitle, 
+                companyID, 
+                internshipDescription, 
+                internshipLocation, 
+                internshipStartDate, 
+                internshipEndDate, 
+                internshipStatus, 
+                companyName,
+                companyDescription, 
+                new Date(), 
+                category,
+                applyBy,
+                availablePositions,
+                whoCanApply,
+                perksOfInternship,
+                skillsRequired,
+            ];
             db.query(q, data, (err, result) => {
 
                 if(err){
@@ -518,4 +551,24 @@ app.get("/internships", (req,res) => {
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}...`);
+});
+
+app.get("/internship/:id", (req,res) => {
+
+    const id = req.params.id;
+
+    db.query('SELECT * FROM internships WHERE internship_ID = ?', [id], (err, result) => {
+
+        if(err){
+
+            console.log("Error selecting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Internship data selected successfully!", result);
+        return res.json(result);
+
+    });
+
 });

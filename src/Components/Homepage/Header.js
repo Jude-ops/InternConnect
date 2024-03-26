@@ -40,7 +40,7 @@ function Header(props){
         
         <div>
 
-             <header className="p-3 text-bg-light my-0">
+             <header className="p-3 text-bg-light">
                 <div className="container-fluid">
                     <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                         <a href="/" className="navbar-brand d-flex align-items-start mb-2 mb-lg-0 text-dark text-decoration-none">
@@ -61,13 +61,26 @@ function Header(props){
                             props.isAuthenticated() ? 
                             
                             <div className = "text-end">
+
+                                {
+                                    userType === "company" && <Link to = "/post_internship"><button type="button" className="btn btn-outline-primary me-2">Post Internship</button></Link>
+                                }
+
                                 <div class="btn-group">
                                     <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Profile
                                     </button>
                                     <ul class="dropdown-menu">
                                         <li><a class="dropdown-item" href="/">Home</a></li>
-                                        <li><a class="dropdown-item" href="/intern/applications">My Applications</a></li>
+                                        {
+                                            userType === "intern" ? 
+                                            <li><a class="dropdown-item" href="/intern/applications">My Applications</a></li>   
+                                        :
+                                            <div>
+                                                <li><a class="dropdown-item" href="/company/internships">My Internships</a></li>
+                                                <li><a class = "dropdown-item" href = "/company/received_applications">Received Applications</a></li>
+                                            </div>    
+                                        }
                                         <li><a class="dropdown-item" href = {`/update/${userType}/${userId}`}>Edit Profile</a></li>
                                         <li><a class="dropdown-item" href="/" onClick={() => {props.logout()}}>Logout</a></li>
                                     </ul>

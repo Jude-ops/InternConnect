@@ -17,7 +17,8 @@ function RegistrationCompany(props){
         confirmPassword: "",
         location: "",
         address: "",
-        telephone: ""
+        telephone: "",
+        description: "",
 
     });
 
@@ -152,6 +153,20 @@ function RegistrationCompany(props){
                                 onChange = {handleChange}
                                 value = {companyInfo.telephone}
                             />
+
+                            <div className = "mb-3">
+                                <label for="description" className="form-label">Company Description</label>
+                                <textarea 
+                                    className="form-control" 
+                                    id="description" 
+                                    rows="6" 
+                                    value = {`${companyInfo.description}`}
+                                    name = "description"
+                                    onChange={(event) => {
+                                        handleChange(event.target.name, event.target.value)
+                                    }}
+                                ></textarea>
+                            </div>
 
                             <div id = "submitButton" className = "mt-5">
                                 <button type="submit" className="btn btn-primary" onClick = {handleSubmit}>Sign Up</button>
