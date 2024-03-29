@@ -3,11 +3,12 @@ import Header from "../Homepage/Header";
 import Footer from "../Homepage/Footer";
 import FormElement from "../Form_Elements/FormElement"; 
 import axios from "axios";
-import { Form, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function PostInternship(props){
 
     const navigate = useNavigate();
+   
     const [internshipInfo, setInternshipInfo] = useState({
 
         internshipTitle: "",

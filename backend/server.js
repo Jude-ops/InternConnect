@@ -96,6 +96,7 @@ app.post("/register/intern", (req, res) => {
 
             // Get the internID of the newly inserted intern
             const internID = result.insertId;
+            const firstName = result[0].first_name;
 
             db.query('INSERT INTO users (username,email,password,user_type,is_Active,intern_ID) VALUES (?,?,?,?,?,?) ', [firstName.concat(lastName),emailAddress,hash,userType,isActive,internID], (err, result) => {
 
@@ -108,7 +109,7 @@ app.post("/register/intern", (req, res) => {
     
                 console.log("User data inserted successfully!", result);
                 const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                res.status(200).json({token, userType}); 
+                res.status(200).json({token, userType, firstName}); 
     
             });
 
@@ -177,6 +178,7 @@ app.post("/login", (req,res) => {
             return;
 
         }
+        
 
         if(result.length > 0){
 
@@ -186,7 +188,9 @@ app.post("/login", (req,res) => {
 
                     console.log("Login successful!");
                     const token = jwt.sign({userId: result[0].user_ID}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                    res.status(200).json({token, userType: result[0].user_type});
+                    const companyID = result[0].company_ID;
+                    const internID = result[0].intern_ID;
+                    res.status(200).json({token, userType: result[0].user_type, companyID, internID});
 
                 }else{
 
@@ -542,7 +546,7 @@ app.get("/internships", (req,res) => {
 
         }
 
-        console.log("Internship data selected successfully!", result);
+        console.log("Internship data selected successfully!");
         return res.json(result);
 
     });
@@ -567,6 +571,46 @@ app.get("/internship/:id", (req,res) => {
         }
 
         console.log("Internship data selected successfully!", result);
+        return res.json(result);
+
+    });
+
+});
+
+app.get("/company/:id/internships", (req,res) => {
+
+    const id = req.params.id;
+
+    db.query('SELECT * FROM internships WHERE company_ID = ?', [id], (err, result) => {
+
+        if(err){
+
+            console.log("Error selecting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Internship data selected successfully!");
+        return res.json(result);
+
+    });
+
+});
+
+app.get("/intern/:id/applications", (req,res) => {
+
+    const id = req.params.id;
+
+    db.query('SELECT * FROM applications WHERE intern_ID = ?', [id], (err, result) => {
+
+        if(err){
+
+            console.log("Error selecting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Application data selected successfully!", result);
         return res.json(result);
 
     });

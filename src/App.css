@@ -119,3 +119,7 @@ input[type="text"], input[type="password"], input[type="email"]{
 .skill-required, .perks-internship{
     padding: 10px !important;
 }
+
+.posted-internships-table{
+    line-height: 4;
+}

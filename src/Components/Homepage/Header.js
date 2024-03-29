@@ -6,11 +6,18 @@ function Header(props){
 
     const [userId, setUserId] = useState(null);
     const [userType, setUserType] = useState(null);
+    const [companyID, setCompanyID] = useState(null);
+    const [internID, setInternID] = useState(null);
 
     useEffect(() => {
 
         const token = localStorage.getItem("token");
         const userType = localStorage.getItem("userType");
+        const companyID = localStorage.getItem("companyID");
+        const internID = localStorage.getItem("internID");
+
+        setCompanyID(companyID);
+        setInternID(internID);
 
         async function fetchUserId(){
 
@@ -24,6 +31,7 @@ function Header(props){
                 const {userId} = response.data;
                 setUserId(userId)
                 setUserType(userType);
+                
 
             } catch (error) {
                 console.log('Error fetching user data:', error);
@@ -74,10 +82,10 @@ function Header(props){
                                         <li><a class="dropdown-item" href="/">Home</a></li>
                                         {
                                             userType === "intern" ? 
-                                            <li><a class="dropdown-item" href="/intern/applications">My Applications</a></li>   
+                                            <li><a class="dropdown-item" href={`/intern/${internID}/applications`}>My Applications</a></li>   
                                         :
                                             <div>
-                                                <li><a class="dropdown-item" href="/company/internships">My Internships</a></li>
+                                                <li><a class="dropdown-item" href={`/company/${companyID}/internships`}>Manage Internships</a></li>
                                                 <li><a class = "dropdown-item" href = "/company/received_applications">Received Applications</a></li>
                                             </div>    
                                         }

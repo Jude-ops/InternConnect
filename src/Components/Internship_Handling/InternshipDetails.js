@@ -88,7 +88,6 @@ function InternshipDetails(props) {
                                                 return responsibility.trim();
                                             });
 
-                                            console.log(trimmedResponsibilities);
                                             return trimmedResponsibilities.map((responsibility,index) => {
                                                 return <ul key = {index}><li>{responsibility}</li></ul>
                                             })

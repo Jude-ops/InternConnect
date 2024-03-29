@@ -4,7 +4,7 @@ import Footer from "../Homepage/Footer";
 import LoginCompany from "../Company_Authentication/LoginPageCompany";
 import LoginIntern from "../Intern_Authentication/LoginPageIntern";
 
-function LoginPage({setToken, isAuthenticated, setUserType}){
+function LoginPage({setToken, isAuthenticated, setUserType, setInternID, setCompanyID}){
 
     const [isIntern,setForm] = useState(true);
     const [isClicked,setClick]  = useState(true);
@@ -20,7 +20,7 @@ function LoginPage({setToken, isAuthenticated, setUserType}){
 
     return(
         <div>
-            <Header isAuthenticated = {isAuthenticated} />
+            <Header isAuthenticated = {isAuthenticated}/>
             {isIntern ? 
                 <LoginIntern 
                     onCompany = {displayCompanyForm} 
@@ -28,6 +28,7 @@ function LoginPage({setToken, isAuthenticated, setUserType}){
                     clicked = {isClicked}
                     setToken = {setToken}
                     setUserType = {setUserType}
+                    setInternID = {setInternID}
                 /> 
                 : <LoginCompany 
                     onCompany = {displayCompanyForm} 
@@ -35,6 +36,7 @@ function LoginPage({setToken, isAuthenticated, setUserType}){
                     clicked = {isClicked}
                     setToken = {setToken}
                     setUserType = {setUserType}
+                    setCompanyID = {setCompanyID}
                 />
             }
             <Footer />

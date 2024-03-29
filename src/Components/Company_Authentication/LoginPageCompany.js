@@ -45,6 +45,11 @@ function LoginCompany(props){
                 localStorage.setItem("userType", userType);
                 props.setUserType(userType);
 
+                const companyID = response.data.companyID;
+                console.log(companyID);
+                localStorage.setItem("companyID", companyID);
+                props.setCompanyID(companyID);
+
                 navigate("/");
 
             };

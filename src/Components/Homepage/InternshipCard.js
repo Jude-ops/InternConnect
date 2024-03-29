@@ -9,8 +9,12 @@ import { Link } from "react-router-dom";
 function InternshipCard(props){
 
     const [internshipData, setInternshipData] = useState([]);
+    const [userType, setUserType] = useState("");
 
     useEffect(() => {
+
+        const userType = localStorage.getItem("userType");
+        setUserType(userType);
 
         async function fetchData(){
             try{
@@ -37,11 +41,17 @@ function InternshipCard(props){
     return(
         <div className = "internshipCardComponent">
 
-            <h3 className = "text-center fw-bold">Hi {props.storedName}!</h3>
+            <h2 className = "heading text-center fw-bold mt-5">Welcome to InternConnect!</h2>
 
-            <h5 className = "text-center text-muted">Let's help you find your internship quickly</h5>
-
-            <h2 className = "heading text-center mt-5">Latest Internships on InternConnect</h2>
+            {
+                userType === "intern" && 
+                <div>
+                    <h3 className = "text-center fw-bold">Hi {props.setStoredName}!</h3>
+                    <h5 className = "text-center text-muted">Let's help you find your internship quickly</h5>
+                </div>
+            }
+            
+            <h2 className = "heading text-center mt-4">Latest Internships on InternConnect</h2>
 
             <div className="container pt-5">
 
