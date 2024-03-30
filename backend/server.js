@@ -577,6 +577,46 @@ app.get("/internship/:id", (req,res) => {
 
 });
 
+app.put("/internship/:id", (req,res) => {
+
+    const id = req.params.id;
+    const {
+        internshipStartDate,
+        internshipEndDate,
+        internshipStatus,
+        applyBy,
+        availablePositions,
+        whoCanApply,
+        perksOfInternship,
+        skillsRequired
+    } = req.body;
+
+    const data = [
+        internshipStartDate,
+        internshipEndDate,
+        internshipStatus,
+        applyBy,
+        availablePositions,
+        whoCanApply,
+        perksOfInternship,
+        skillsRequired,
+    ];
+
+    db.query('UPDATE internships SET start_date = ?, end_date = ?, internship_status = ?, apply_by = ?, available_positions = ?, who_can_apply = ?, perks = ?, skills_required = ? WHERE internship_ID = ?', [...data, id], (err, result) => {
+            
+            if(err){
+    
+                console.log("Error updating the data in the database!", err);
+                return;
+    
+            }
+    
+            console.log("Internship data updated successfully!", result);
+            res.send({message: "Internship data updated successfully!"});
+    });
+
+});
+
 app.get("/company/:id/internships", (req,res) => {
 
     const id = req.params.id;
@@ -612,6 +652,26 @@ app.get("/intern/:id/applications", (req,res) => {
 
         console.log("Application data selected successfully!", result);
         return res.json(result);
+
+    });
+
+});
+
+app.delete("company/:id/internship/:internshipID/delete", (req,res) => {
+
+    const internshipID = req.params.internshipID;
+
+    db.query('DELETE FROM internships WHERE internship_ID = ?', [internshipID], (err, result) => {
+
+        if(err){
+
+            console.log("Error deleting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Internship data deleted successfully!", result);
+        res.send({message: "Internship data deleted successfully!"});
 
     });
 

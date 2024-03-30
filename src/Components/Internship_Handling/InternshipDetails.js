@@ -167,6 +167,9 @@ function InternshipDetails(props) {
                                         <div className = "p-1 ms-3">Start Date: 
                                             <p className = "small">{new Date(internshipDetails[0].start_date).toDateString()}</p>
                                         </div>
+                                        <div className = "p-1 ms-3">End Date:
+                                            <p className = "small">{new Date(internshipDetails[0].end_date).toDateString()}</p>
+                                        </div>
                                     </div>
                                     <div className = "d-flex mb-3">
                                         <div className = "icon"></div>
