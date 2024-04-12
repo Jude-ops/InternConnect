@@ -123,3 +123,13 @@ input[type="text"], input[type="password"], input[type="email"]{
 .posted-internships-table{
     line-height: 4;
 }
+
+.modal-header{
+    background-color: #0B5ED7;
+    color: white;
+}
+
+::placeholder{
+    font-size: 14px;
+    color: #C3C3C3 !important;
+}

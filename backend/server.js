@@ -5,8 +5,11 @@ import cors from "cors";
 import mysql from "mysql";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import multer from "multer";
+import {dirname, join} from "path";
+import {fileURLToPath} from "url";
 
-
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const saltRounds = 10;
 const app = express();
 const port = 5000;
@@ -58,6 +61,18 @@ const db = mysql.createConnection({
 
 });
 
+// Multer configuration for file uploads
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, join(__dirname, 'uploads/')); // Save files to the 'uploads' directory
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname); // Use the original filename
+    }
+});
+const upload = multer({ storage: storage });
+
+
 db.connect((err) => {
 
     if(err){
@@ -72,6 +87,7 @@ db.connect((err) => {
     }
 
 });
+
 
 //Registering interns into the database
 app.post("/register/intern", (req, res) => {
@@ -205,7 +221,6 @@ app.post("/login", (req,res) => {
 
             console.log("User doesn't exist!");
             res.send({message: "User doesn't exist!"});
-           
 
         }
 
@@ -333,8 +348,6 @@ app.put("/update/company/:id", (req, res) => {
 
     });
 
-
-    
 
 });
 
@@ -657,7 +670,7 @@ app.get("/intern/:id/applications", (req,res) => {
 
 });
 
-app.delete("company/:id/internship/:internshipID/delete", (req,res) => {
+app.delete("/company/:id/internship/:internshipID/delete", (req,res) => {
 
     const internshipID = req.params.internshipID;
 
@@ -675,4 +688,95 @@ app.delete("company/:id/internship/:internshipID/delete", (req,res) => {
 
     });
 
+});
+
+app.get("/intern/info/:internID", (req,res) => {
+
+    const internID = req.params.internID;
+    console.log(internID);
+
+    db.query('SELECT * FROM interns WHERE intern_ID = ?', [internID], (err, result) => {
+
+        if(err){
+
+            console.log("Error selecting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Intern data selected successfully!");
+        return res.json(result);
+
+    });
+    
+});
+
+//Route for applying to an internship
+app.post('/internship/:id/apply', upload.single('resume'), (req, res) => {
+
+    // Save file metadata to the database
+    const filename = req.file.originalname;
+    const resume = req.file.path;
+    const fileType = req.file.mimetype;
+    const fileSize = req.file.size;
+
+    const id = req.params.id;
+
+    const {
+        internID, 
+        companyID, 
+        fullName, 
+        email, 
+        phone,
+        coverletter,
+        applicationStatus
+    } = req.body;
+
+    const data = [
+        internID, 
+        companyID,
+        id, 
+        fullName, 
+        email, 
+        phone,
+        coverletter,
+        resume,
+        applicationStatus
+    ];
+
+    db.query('INSERT INTO applications (intern_ID, company_ID, internship_ID, full_name, email, phone, cover_letter, resume, application_status) VALUES (?,?,?,?,?,?,?,?,?) ', [...data], (err, result) => {
+        
+        if(err){
+
+            console.log("Error inserting the data into the database!", err);
+            return;
+
+        }
+
+        console.log("Application data inserted successfully!", result);
+        res.send({message: "Application data inserted successfully!"});
+
+    });
+   
+    const sql = 'INSERT INTO documents (document_name, document_type, document_size, document_path, intern_ID) VALUES (?, ?, ?, ?, ?)';
+    db.query(sql, [filename, fileType, fileSize, resume, internID ], (err, result) => {
+        if (err) throw err;
+        console.log('File uploaded to the database', result);
+        res.send('File uploaded successfully');
+    });
+});
+
+//Route to retrieve and get a file
+app.get('/document/:id', (req, res) => {
+    const fileId = req.params.id;
+    const sql = 'SELECT filepath FROM files WHERE id = ?';
+    db.query(sql, fileId, (err, result) => {
+        if (err) throw err;
+        if (result.length > 0) {
+            const filepath = result[0].filepath;
+            res.sendFile(filepath); // Serve the file
+        } else {
+            res.status(404).send('File not found');
+        }
+    });
 });

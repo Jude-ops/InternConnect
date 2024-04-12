@@ -11,6 +11,7 @@ import PostInternship from "./Components/Internship_Handling/PostInternship";
 import InternshipDetails from "./Components/Internship_Handling/InternshipDetails";
 import ManageInternships from "./Components/Internship_Handling/ManageInternships";
 import EditInternship from "./Components/Internship_Handling/EditInternship";
+import ManageApplications from "./Components/Internship_Handling/ManageApplications";
 
  function App() {
 
@@ -45,23 +46,23 @@ import EditInternship from "./Components/Internship_Handling/EditInternship";
 
   }, [companyID, internID, token, userType])
 
-    const user = () => {
+const user = () => {
 
-    return !!token;  // !! converts the value to boolean
+  return !!token;  // !! converts the value to boolean
 
-  }
+}
 
 
 const logout = () => {
 
-    localStorage.removeItem("token");
-    setToken("");
-    localStorage.removeItem("userType");
-    setUserType("");
-    localStorage.removeItem("companyID");
-    setCompanyID("");
-    localStorage.removeItem("internID");
-    setInternID("");
+  localStorage.removeItem("token");
+  setToken("");
+  localStorage.removeItem("userType");
+  setUserType("");
+  localStorage.removeItem("companyID");
+  setCompanyID("");
+  localStorage.removeItem("internID");
+  setInternID("");
 
 };
 
@@ -78,11 +79,12 @@ const logout = () => {
           <Route path = "/post_internship" element = { user() && <PostInternship isAuthenticated = {user}/>} />
           <Route path = "/internship/:id" element = {<InternshipDetails isAuthenticated = {user}/>} />
           <Route path = "/company/:id/internships" element = {<ManageInternships isAuthenticated = {user} />} />
+          <Route path = "/company/:id/received_applications" element = {<ManageApplications isAuthenticated = {user} />} /> 
           <Route path = "/company/:companyID/internship/:id/edit" element = {<EditInternship isAuthenticated = {user} />} />
         </Routes>
       </BrowserRouter>
     </div>
   );
-}
+ }
 
 export default App;

@@ -83,7 +83,7 @@ function EditInternship(props) {
                 <div className = "row mb-3">
                     <div className = "col-12 col-sm-6">
                         <FormElement 
-                            label = "internshipStartDate" 
+                            labelFor = "internshipStartDate" 
                             type = "date" 
                             placeholder = "Internship Start Date"
                             id = "internshipStartDate"
@@ -96,7 +96,7 @@ function EditInternship(props) {
 
                     <div className = "col-12 col-sm-6">
                         <FormElement 
-                            label = "internshipEndDate" 
+                            labelFor = "internshipEndDate" 
                             type = "date" 
                             placeholder = "Internship End Date"
                             id = "internshipEndDate"
@@ -111,7 +111,7 @@ function EditInternship(props) {
                 <div className = "row mb-3">
                     <div className = "col-12 col-sm-6">
                         <FormElement 
-                            label = "applyBy" 
+                            labelFor = "applyBy" 
                             type = "date" 
                             placeholder = "Apply By"
                             id = "applyBy"
@@ -124,7 +124,7 @@ function EditInternship(props) {
 
                     <div className = "col-12 col-sm-6">
                         <FormElement 
-                            label = "availablePositions" 
+                            labelFor = "availablePositions" 
                             type = "number" 
                             placeholder = "Available Positions"
                             id = "availablePositions"
@@ -150,7 +150,7 @@ function EditInternship(props) {
                     ></textarea>
                 </div>
 
-                <div className="mb-4 mt-4">
+                <div className="my-4">
                         <label for="skillsRequired" class="form-label">Skill(s) Required</label>
                         <textarea
                             className="form-control" 
@@ -165,7 +165,7 @@ function EditInternship(props) {
                     </div>
 
                 <FormElement 
-                        label = "perksOfInternship" 
+                        labelFor = "perksOfInternship" 
                         type = "text" 
                         placeholder = "Perks of Internship"
                         id = "perksOfInternship"
