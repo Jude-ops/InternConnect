@@ -12,6 +12,7 @@ import InternshipDetails from "./Components/Internship_Handling/InternshipDetail
 import ManageInternships from "./Components/Internship_Handling/ManageInternships";
 import EditInternship from "./Components/Internship_Handling/EditInternship";
 import ManageApplications from "./Components/Internship_Handling/ManageApplications";
+import InternshipsListing from "./Components/Internship_Handling/InternshipsListing";
 
  function App() {
 
@@ -81,6 +82,7 @@ const logout = () => {
           <Route path = "/company/:id/internships" element = {<ManageInternships isAuthenticated = {user} />} />
           <Route path = "/company/:id/received_applications" element = {<ManageApplications isAuthenticated = {user} />} /> 
           <Route path = "/company/:companyID/internship/:id/edit" element = {<EditInternship isAuthenticated = {user} />} />
+          <Route path = "/internships" element = {<InternshipsListing isAuthenticated = {user} />} />
         </Routes>
       </BrowserRouter>
     </div>

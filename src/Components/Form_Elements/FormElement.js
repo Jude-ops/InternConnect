@@ -5,7 +5,7 @@ function FormElement(props){
 
     return(
         <div className="mb-3">
-            <label for={props.labelFor} className="form-label fw-bold text-uppercase">{props.labelTitle}</label>
+            <label htmlFor={props.labelFor} className="form-label fw-bold text-uppercase">{props.labelTitle}</label>
             <input 
                 type={props.type} 
                 className="form-control" 
