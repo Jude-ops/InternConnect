@@ -566,10 +566,6 @@ app.get("/internships", (req,res) => {
 
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}...`);
-});
-
 app.get("/internship/:id", (req,res) => {
 
     const id = req.params.id;
@@ -779,4 +775,9 @@ app.get('/document/:id', (req, res) => {
             res.status(404).send('File not found');
         }
     });
+});
+
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}...`);
 });

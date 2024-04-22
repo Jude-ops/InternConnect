@@ -1,17 +1,105 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function InternshipsListing(props) {
 
     const [internships, setInternships] = useState([]);
     const [filteredInternships, setFilteredInternships] = useState([]);
+    const [searchKeyword, setSearchKeyword] = useState("");
     const [filters, setFilters] = useState({
         internshipCategory: "all",
         internshipLocation: "all",
         internshipDuration: "all",
         datePosted: "all",
     });
+
+
+    function handleFiltersChange(name, value){
+        setFilters(prevValue => {
+            return {
+                ...prevValue,
+                [name]: value,
+            };
+        });
+    }
+
+    useEffect(() => {
+       async function fetchInternships(){
+           try{
+               const response = await axios.get("http://localhost:5000/internships");
+               setInternships(response.data);
+           }catch(err){
+               console.log(err);
+           }
+       }
+
+        fetchInternships();
+    }, []); 
+
+    // Filter internships based on the filters selected
+    useEffect(() => {
+        const filteredInternships = internships.filter((internship) => {
+            if(filters.internshipCategory === "all" && filters.internshipLocation === "all" && filters.internshipDuration === "all" && filters.datePosted === "all"){
+                return true;
+            }
+
+            if(filters.internshipCategory !== "all" && internship.category !== filters.internshipCategory){
+                return false;
+            }
+
+            if(filters.internshipLocation !== "all" && internship.location_city !== filters.internshipLocation){
+                return false;
+            }
+
+            if(filters.internshipDuration !== "all") {
+                const start = new Date(internship.start_date);
+                const end = new Date(internship.end_date);
+              
+                const startYear = start.getFullYear();
+                const startMonth = start.getMonth();
+              
+                const endYear = end.getFullYear();
+                const endMonth = end.getMonth();
+              
+                const duration = (endYear - startYear) * 12 + (endMonth - startMonth);
+              
+                if (duration !== parseInt(filters.internshipDuration)) {
+                  return false;
+                }
+            }
+
+            if(filters.datePosted === "all"){
+                return true;
+            }
+
+            const currentDate = new Date();
+            const postedDate = new Date(internship.posted_On);
+            const timeDifference = currentDate.getTime() - postedDate.getTime();
+
+            if(filters.datePosted === "last24Hours" && timeDifference > 24 * 60 * 60 * 1000){
+                return false;
+            }
+
+            if(filters.datePosted === "last7Days" && timeDifference > 7 * 24 * 60 * 60 * 1000){
+                return false;
+            }
+
+            if(filters.datePosted === "last14Days" && timeDifference > 14 * 24 * 60 * 60 * 1000){
+                return false;
+            }
+
+            if(filters.datePosted === "last30Days" && timeDifference > 30 * 24 * 60 * 60 * 1000){
+                return false;
+            }
+
+            return true;
+        });
+
+        setFilteredInternships(filteredInternships);
+    }, [internships, filters]);
 
   return (
     <div>
@@ -26,7 +114,7 @@ function InternshipsListing(props) {
         </div>
 
         <div className="row mt-4">
-            <div className="col-md-4">
+            <div className="col-md-4" style = {{position: "sticky", top: "30px", height: "100%"}}>
                 <div className = "internship-overview internship-filters w-100">
                     <div className = "filter-section">
                         <h4>Filters</h4>
@@ -44,6 +132,9 @@ function InternshipsListing(props) {
                                 aria-describedby="keywordSearch"
                                 id = "keywordSearch"
                                 name = "keywordSearch"
+                                onChange={(e) => {
+                                    setSearchKeyword(e.target.value);
+                                }}
                             />
                             <button className="btn btn-outline-secondary" type="button" id="keywordSearchButton">Search</button>
                         </div>
@@ -51,8 +142,14 @@ function InternshipsListing(props) {
 
                     <div className="form-group mt-3">
                         <label className = "form-label fw-bold" for="internshipSelect">Internship Category</label>
-                        <select className="form-control form-select" id="internshipSelect" name = "internshipCategory">
-                            <option selected value = "all">All Categories</option>
+                        <select 
+                            className="form-control form-select" 
+                            id="internshipSelect" 
+                            name = "internshipCategory"
+                            onChange = {(event) => handleFiltersChange(event.target.name, event.target.value)}
+                            value = {filters.internshipCategory}
+                        >
+                            <option value = "all">All Categories</option>
                             <option value = "Software Development">Software Development</option>
                             <option value = "Data Science">Data Science</option>
                             <option value = "Security Management">Security Management</option>
@@ -62,8 +159,14 @@ function InternshipsListing(props) {
 
                     <div className="form-group mt-3">
                         <label className = "form-label fw-bold" for="locationSelect">Location</label>
-                        <select className="form-control form-select" id="locationSelect" name = "internshipLocation">
-                            <option selected value = "all">All Locations</option>
+                        <select 
+                            className="form-control form-select" 
+                            id="locationSelect" 
+                            name = "internshipLocation"
+                            onChange = {(event) => handleFiltersChange(event.target.name, event.target.value)}
+                            value = {filters.internshipLocation}
+                        >
+                            <option value = "all">All Locations</option>
                             <option value = "Bamenda">Bamenda</option>
                             <option value = "Yaounde">Yaounde</option>
                             <option value = "Douala">Douala</option>
@@ -79,14 +182,22 @@ function InternshipsListing(props) {
 
                     <div className="form-group mt-3">
                         <label className = "form-label fw-bold" for="durationSelect">Max. duration (months)</label>
-                        <select className="form-control form-select" id="durationSelect" name = "internshipDuration">
-                            <option selected value = "all">Any Duration</option>
+                        <select 
+                            className="form-control form-select" 
+                            id="durationSelect" 
+                            name = "internshipDuration"
+                            onChange = {(event) => handleFiltersChange(event.target.name, event.target.value)}
+                            value = {filters.internshipDuration}
+                        >
+                            <option value = "all">Any Duration</option>
                             <option value = "1">1 Month</option>
                             <option value = "2">2 Months</option>
                             <option value = "3">3 Months</option>
                             <option value = "4">4 Months</option>
                             <option value = "5">5 Months</option>
                             <option value = "6">6 Months</option>
+                            <option value = "7">7 Months</option>
+                            <option value = "8">8 Months</option>
                         </select>
                     </div>
 
@@ -98,9 +209,15 @@ function InternshipsListing(props) {
                             <input 
                                 className="form-check-input" 
                                 type="radio" 
-                                value="" 
+                                value="last24Hours" 
                                 id="last24Hours" 
                                 name = "datePosted"
+                                checked = {filters.datePosted === "last24Hours"}
+                                onChange={
+                                    (event) => {
+                                        handleFiltersChange(event.target.name, event.target.value);
+                                    }
+                                }
                             />
                             <label className="form-check-label" for="last24Hours">
                                 Last 24 hours
@@ -111,9 +228,15 @@ function InternshipsListing(props) {
                             <input 
                                 className="form-check-input" 
                                 type="radio" 
-                                value="" 
+                                value="last7Days" 
                                 id="last7Days" 
                                 name = "datePosted"
+                                checked = {filters.datePosted === "last7Days"}
+                                onChange={
+                                    (event) => {
+                                        handleFiltersChange(event.target.name, event.target.value);
+                                    }
+                                }
                             />
                             <label className="form-check-label" for="last7Days">
                                 Last 7 days
@@ -124,9 +247,15 @@ function InternshipsListing(props) {
                             <input 
                                 className="form-check-input" 
                                 type="radio" 
-                                value="" 
+                                value="last14Days" 
                                 id="last14Days" 
                                 name = "datePosted"
+                                checked = {filters.datePosted === "last14Days"}
+                                onChange={
+                                    (event) => {
+                                        handleFiltersChange(event.target.name, event.target.value);
+                                    }
+                                }
                             />
                             <label className="form-check-label" for="last14Days">
                                 Last 14 days
@@ -137,9 +266,15 @@ function InternshipsListing(props) {
                             <input 
                                 className="form-check-input" 
                                 type="radio" 
-                                value="" 
+                                value="last30Days" 
                                 id="last30Days" 
                                 name = "datePosted"
+                                checked = {filters.datePosted === "last30Days"}
+                                onChange={
+                                    (event) => {
+                                        handleFiltersChange(event.target.name, event.target.value);
+                                    }
+                                }
                             />
                             <label className="form-check-label" for="last30Days">
                                 Last 30 days
@@ -153,6 +288,12 @@ function InternshipsListing(props) {
                                 value="all" 
                                 id="allPostedDates"
                                 name = "datePosted"
+                                checked = {filters.datePosted === "all"}
+                                onChange={
+                                    (event) => {
+                                        handleFiltersChange(event.target.name, event.target.value);
+                                    }
+                                }
                             />
                             <label className="form-check-label" for="allPostedDates">
                                 All
@@ -169,69 +310,43 @@ function InternshipsListing(props) {
 
             <div className="col-md-8">
                 <div className = "internship-key-details w-100">
-
-                    <div className = "card internship-listing">
-                        <div className="card-body d-flex flex-column">
-                            <div className = "d-flex mb-3">
-                                <div className = "me-3 logo"></div>
-                                <div className = "d-flex flex-column">
-                                    <h3 className="card-title fw-bold">Software Development Intern</h3>
-                                    <p className="card-subtitle mb-2 text-muted">Company Name</p>
+                    {filteredInternships.filter((internship) => {
+                            return searchKeyword.toLowerCase() === "" ? internship : internship.internship_name.toLowerCase().includes(searchKeyword);
+                        }).map((internship) => (
+                        <div className = "card internship-listing mb-4">
+                            <div className="card-body d-flex flex-column">
+                                <div className = "d-flex mb-3">
+                                    <div className = "me-3 logo"></div>
+                                    <div className = "d-flex flex-column">
+                                        <h3 className="card-title fw-bold">{internship.internship_name}</h3>
+                                        <p className="card-subtitle mb-2 text-muted">{internship.company_Name}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <div className = "d-flex justify-content-between align-items-center">
-                                <span className="card-text"><small className = "text-muted">Location</small></span>
-                                <span className="card-text"><small className = "text-muted">Duration</small></span>
-                                <span className="card-text"><small className = "text-muted">Start Date</small></span>
-                                <button className="btn btn-primary btn-sm">View Details</button>
-                            </div>
+                                
+                                <div className = "d-flex justify-content-between align-items-center">
+                                    <span className="card-text"><small className = "text-muted">{internship.location_city}</small></span>
+                                    <span className="card-text"><small className = "text-muted">{
+                                            (() => {
+                                                const start = new Date(internship.start_date);
+                                                const end = new Date(internship.end_date);
 
-                            <span className="card-text mt-3"><small className = "text-muted">Posted Date</small></span>
-                        </div>
-                    </div>
+                                                const startYear = start.getFullYear();
+                                                const startMonth = start.getMonth();
 
-                    <div className = "card internship-listing mt-4">
-                        <div className="card-body d-flex flex-column">
-                            <div className = "d-flex mb-3">
-                                <div className = "me-3 logo"></div>
-                                <div className = "d-flex flex-column">
-                                    <h3 className="card-title fw-bold">Data Science Intern</h3>
-                                    <p className="card-subtitle mb-2 text-muted">Company Name</p>
+                                                const endYear = end.getFullYear();
+                                                const endMonth = end.getMonth();
+
+                                                return (endYear - startYear) * 12 + (endMonth - startMonth) + " months";
+                                            })()
+                                            }</small></span>
+                                    <span className="card-text"><small className = "text-muted">Start Date: {new Date(internship.start_date).toDateString()}</small></span>
+                                    <Link to = {`/internship/${internship.internship_ID}`}><button className="btn btn-primary btn-sm">View Details</button></Link>
                                 </div>
-                            </div>
-                            
-                            <div className = "d-flex justify-content-between align-items-center">
-                                <span className="card-text"><small className = "text-muted">Location</small></span>
-                                <span className="card-text"><small className = "text-muted">Duration</small></span>
-                                <span className="card-text"><small className = "text-muted">Start Date</small></span>
-                                <button className="btn btn-primary btn-sm">View Details</button>
-                            </div>
 
-                            <span className="card-text mt-3"><small className = "text-muted">Posted Date</small></span>
+                                <span className="card-text mt-3"><small className = "text-muted">Posted Date: {new Date(internship.posted_On).toDateString()}</small></span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className = "card internship-listing mt-4">
-                        <div className="card-body d-flex flex-column">
-                            <div className = "d-flex mb-3">
-                                <div className = "me-3 logo"></div>
-                                <div className = "d-flex flex-column">
-                                    <h3 className="card-title fw-bold">Cyber Security Intern</h3>
-                                    <p className="card-subtitle mb-2 text-muted">Company Name</p>
-                                </div>
-                            </div>
-                            
-                            <div className = "d-flex justify-content-between align-items-center">
-                                <span className="card-text"><small className = "text-muted">Location</small></span>
-                                <span className="card-text"><small className = "text-muted">Duration</small></span>
-                                <span className="card-text"><small className = "text-muted">Start Date</small></span>
-                                <button className="btn btn-primary btn-sm">View Details</button>
-                            </div>
-
-                            <span className="card-text mt-3"><small className = "text-muted">Posted Date</small></span>
-                        </div>
-                    </div>
+                    ))}
                 </div>
             </div> 
         </div>
