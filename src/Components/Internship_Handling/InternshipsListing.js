@@ -9,6 +9,8 @@ function InternshipsListing(props) {
     const [internships, setInternships] = useState([]);
     const [filteredInternships, setFilteredInternships] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [internshipsPerPage] = useState(10);
     const [filters, setFilters] = useState({
         internshipCategory: "all",
         internshipLocation: "all",
@@ -100,6 +102,21 @@ function InternshipsListing(props) {
 
         setFilteredInternships(filteredInternships);
     }, [internships, filters]);
+
+    const indexOfLastInternship = currentPage * internshipsPerPage;
+    const indexOfFirstInternship = indexOfLastInternship - internshipsPerPage;
+    const currentInternships = filteredInternships.slice(indexOfFirstInternship, indexOfLastInternship);
+
+    function resetFilters(){
+        setFilters({
+            internshipCategory: "all",
+            internshipLocation: "all",
+            internshipDuration: "all",
+            datePosted: "all",
+        });
+
+        setSearchKeyword("");
+    }
 
   return (
     <div>
@@ -302,7 +319,7 @@ function InternshipsListing(props) {
                     </div>
 
                     <div className="form-group mt-3 d-flex flex-row-reverse">
-                        <button className="btn btn-primary">Reset Filters</button>
+                        <button className="btn btn-primary" onClick={resetFilters}>Reset Filters</button>
                     </div>
 
                 </div>
@@ -310,7 +327,7 @@ function InternshipsListing(props) {
 
             <div className="col-md-8">
                 <div className = "internship-key-details w-100">
-                    {filteredInternships.filter((internship) => {
+                    {currentInternships.filter((internship) => {
                             return searchKeyword.toLowerCase() === "" ? internship : internship.internship_name.toLowerCase().includes(searchKeyword);
                         }).map((internship) => (
                         <div className = "card internship-listing mb-4">
@@ -348,6 +365,26 @@ function InternshipsListing(props) {
                         </div>
                     ))}
                 </div>
+
+                <nav aria-label="Page navigation example" className="mt-3">
+                    <ul className="pagination justify-content-center">
+                        <li className="page-item">
+                            <button className="page-link" onClick = {() => setCurrentPage(currentPage - 1)} disabled = {currentPage === 1 } aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </button>
+                        </li>
+                        {Array.from({length: Math.ceil(filteredInternships.length / internshipsPerPage)}, (_, i) => 
+                            <li key={i} className={`page-item ${i + 1 === currentPage ? 'active' : ''}`}>
+                                <button className="page-link" onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
+                            </li>
+                        )}
+                        <li className="page-item">
+                            <button className="page-link" onClick={() => setCurrentPage(currentPage + 1)} disabled = {currentPage === Math.ceil(filteredInternships.length / internshipsPerPage)} aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
             </div> 
         </div>
       </div>

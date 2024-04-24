@@ -62,10 +62,6 @@ function Header(props){
                             <li className = "nav-item mx-3"><a href = "/about" className="nav-link px-2 text-secondary" id = "header-link">About</a></li>
                         </ul>
 
-                        <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-                            <input id = "searchInput" type="search" className="form-control form-control-dark text-bg-light" placeholder="Search..." aria-label="Search" />
-                        </form>
-
                         {
                             props.isAuthenticated() ? 
                             

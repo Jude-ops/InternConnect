@@ -41,19 +41,18 @@ function InternshipCard(props){
     return(
         <div className = "internshipCardComponent">
 
-            <h2 className = "heading text-center fw-bold mt-5">Welcome to InternConnect!</h2>
+            <h1 className = "heading text-center fw-bold mt-5">Welcome to InternConnect!</h1>
 
             {
                 userType === "intern" && 
                 <div>
-                    <h3 className = "text-center fw-bold">Hi {props.setStoredName}!</h3>
-                    <h5 className = "text-center text-muted">Let's help you find your internship quickly</h5>
+                    <h5 className = "text-center text-muted mt-3">Let's help you find your internship quickly</h5>
                 </div>
             }
             
-            <h2 className = "heading text-center mt-4">Latest Internships on InternConnect</h2>
+            <h2 className = "heading text-center mt-5">Latest Internships on InternConnect</h2>
 
-            <div className="container pt-5">
+            <div className="container mt-3">
 
                 <div className="row">
 
