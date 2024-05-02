@@ -145,4 +145,52 @@ input[type="text"], input[type="password"], input[type="email"]{
 .internship-filters{
     box-shadow: 0 0 4px rgba(72,72,72,.12), 0 2px 2px rgba(72,72,72,.08);
     border-radius: 10px;
+    background-color: white;
+}
+
+.user-profile a:hover{
+    color: #2980B9;
+}
+
+.user-profile a:focus{
+    color: #2980B9;
+}
+
+.btn-primary{
+    background-color: #2980B9 !important;
+    border-color: #2980B9 !important;
+}
+
+.list-group{
+    border: 1px solid #EDEDED;
+    padding: 30px !important;
+    background-color: white;
+}
+
+.list-group-item{
+    border-color: #EDEDED !important;
+    padding: 10px 20px !important;
+}
+
+.dropdown-menu{
+    margin-top: 20px !important;
+    border: none !important;
+    box-shadow: 0 0 4px rgba(72,72,72,.12), 0 2px 2px rgba(72,72,72,.08);
+    padding: 15px !important;
+}
+
+.dropdown-item{
+    padding: 10px 20px !important;
+}
+
+.dropdown-item:hover{
+    color: #2980B9 !important;
+}
+
+.dropdown-item:focus{
+    background-color: white !important;
+}
+
+table thead th{
+    border-bottom: 3px solid #EDEDED !important;
 }

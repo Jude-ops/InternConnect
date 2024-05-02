@@ -84,7 +84,7 @@ const logout = () => {
           <Route path = "/company/:id/received_applications" element = {<ManageApplications isAuthenticated = {user} />} /> 
           <Route path = "/company/:companyID/internship/:id/edit" element = {<EditInternship isAuthenticated = {user} />} />
           <Route path = "/internships" element = {<InternshipsListing isAuthenticated = {user} />} />
-          <Route path = "/intern/:id/applications" element = {<MyApplications isAuthenticated = {user} />} />
+          <Route path = "/intern/:id/applications" element = {<MyApplications isAuthenticated = {user} logout = {logout} />} />
         </Routes>
       </BrowserRouter>
     </div>

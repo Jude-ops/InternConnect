@@ -12,6 +12,7 @@ body{
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    background-color: #F3F6F9 !important;
 }
 
 .slick-slide > div{

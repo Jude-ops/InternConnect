@@ -71,23 +71,62 @@ function Header(props){
                                     userType === "company" && <Link to = "/post_internship"><button type="button" className="btn btn-outline-primary me-2">Post Internship</button></Link>
                                 }
 
-                                <div class="btn-group">
+                                <div class="dropdown">
                                     <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Profile
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="/">Home</a></li>
+                                        <li>
+                                            <a class="dropdown-item" href="/">
+                                                <i class="bi bi-house-door-fill me-2"></i>
+                                                Home
+                                            </a>
+                                        </li>
                                         {
                                             userType === "intern" ? 
-                                            <li><a class="dropdown-item" href={`/intern/${internID}/applications`}>My Applications</a></li>   
+                                            <div>
+                                                <li>
+                                                    <a class = "dropdown-item" href = {`/intern/${internID}/saved_internships`}>
+                                                        <i class = "bi bi-bookmark-fill me-2"></i>
+                                                        Saved Internships
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href={`/intern/${internID}/applications`}>
+                                                        <i class="bi bi-journal-text me-2"></i>
+                                                        My Applications
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href={`/intern/${internID}/applications`}>
+                                                        <i class="bi bi-person-circle me-2"></i>
+                                                        Public Profile
+                                                    </a>
+                                                </li>  
+                                            </div>  
                                         :
                                             <div>
-                                                <li><a class="dropdown-item" href={`/company/${companyID}/internships`}>Manage Internships</a></li>
+                                                <li>
+                                                    <a class="dropdown-item" href={`/company/${companyID}/internships`}>
+                                                        <i class="bi bi-kanban-fill me-2"></i>
+                                                        Manage Internships
+                                                    </a>
+                                                </li>
                                                 <li><a class = "dropdown-item" href = {`/company/${companyID}/received_applications`}>Received Applications</a></li>
                                             </div>    
                                         }
-                                        <li><a class="dropdown-item" href = {`/update/${userType}/${userId}`}>Edit Profile</a></li>
-                                        <li><a class="dropdown-item" href="/login" onClick={props.logout}>Logout</a></li>
+                                        <li>
+                                            <a class="dropdown-item" href = {`/update/${userType}/${userId}`}>
+                                                <i class="bi bi-pencil-square me-2"></i>
+                                                Edit Profile
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/login" onClick={props.logout}>
+                                                <i class="bi bi-box-arrow-right me-2"></i>
+                                                Logout
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div> 
@@ -99,8 +138,18 @@ function Header(props){
                                         Register
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" href="/register/intern">Register as Intern</a></li>
-                                        <li><a class="dropdown-item" href="/register/company">Register as Company</a></li>
+                                        <li>
+                                            <a class="dropdown-item" href="/register/intern">
+                                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                                Register as Intern
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="/register/company">
+                                                <i class="bi bi-box-arrow-in-right me-2"></i>
+                                                Register as Company
+                                            </a>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>

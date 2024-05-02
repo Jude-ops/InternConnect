@@ -131,7 +131,7 @@ function InternshipsListing(props) {
         </div>
 
         <div className="row mt-4">
-            <div className="col-md-4" style = {{position: "sticky", top: "30px", height: "100%"}}>
+            <div className="col-12 col-md-4" style = {{position: "sticky", top: "30px", height: "100%"}}>
                 <div className = "internship-overview internship-filters w-100">
                     <div className = "filter-section">
                         <h4>Filters</h4>
@@ -325,7 +325,7 @@ function InternshipsListing(props) {
                 </div>
             </div>
 
-            <div className="col-md-8">
+            <div className="col-12 col-md-8">
                 <div className = "internship-key-details w-100">
                     {currentInternships.filter((internship) => {
                             return searchKeyword.toLowerCase() === "" ? internship : internship.internship_name.toLowerCase().includes(searchKeyword);
