@@ -48,15 +48,19 @@ function Header(props){
         
         <div>
 
-            <header className="p-3 text-bg-light">
-                <div className="container-fluid">
+            <header className="text-bg-light navbar navbar-expand-lg" style = {{padding: "20px"}}>
+                <div className="container d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start" style = {{padding: "0px 15px", width: "84%"}}>
+                    <a href="/" className="navbar-brand d-flex align-items-start mb-2 mb-lg-0 text-dark text-decoration-none">
+                        <span>InternConnect</span> 
+                    </a>
 
-                    <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                        <a href="/" className="navbar-brand d-flex align-items-start mb-2 mb-lg-0 text-dark text-decoration-none">
-                           <span>InternConnect</span> 
-                        </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
-                        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 ms-5 justify-content-center mb-md-0">
+                    <div className="collapse navbar-collapse" id="navbarSupportedContent">
+
+                        <ul className="navbar-nav me-auto col-12 col-lg-auto me-lg-auto mb-2 ms-5 justify-content-center mb-md-0">
                             <li className = "nav-item mx-3"><a href = "/" className="nav-link px-2 text-dark" id = "header-link">Home</a></li>
                             <li className = "nav-item mx-3"><a href = "/internships" className="nav-link px-2 text-secondary" id = "header-link">Internships</a></li>
                             <li className = "nav-item mx-3"><a href = "/about" className="nav-link px-2 text-secondary" id = "header-link">About</a></li>
@@ -65,7 +69,7 @@ function Header(props){
                         {
                             props.isAuthenticated() ? 
                             
-                            <div className = "text-end">
+                            <div className = "d-flex">
 
                                 {
                                     userType === "company" && <Link to = "/post_internship"><button type="button" className="btn btn-outline-primary me-2">Post Internship</button></Link>
@@ -131,7 +135,7 @@ function Header(props){
                                 </div>
                             </div> 
                             : 
-                            <div className="text-end">
+                            <div className="d-flex">
                                 <Link to = "/login"><button type="button" className="btn btn-outline-primary me-2">Login</button></Link>
                                 <div class="btn-group">
                                     <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

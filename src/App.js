@@ -14,6 +14,7 @@ import EditInternship from "./Components/Internship_Handling/EditInternship";
 import ManageApplications from "./Components/Internship_Handling/ManageApplications";
 import InternshipsListing from "./Components/Internship_Handling/InternshipsListing";
 import MyApplications from "./Components/Intern_Profile/MyApplications";
+import SavedInternships from "./Components/Intern_Profile/SavedInternships";
 
  function App() {
 
@@ -85,6 +86,7 @@ const logout = () => {
           <Route path = "/company/:companyID/internship/:id/edit" element = {<EditInternship isAuthenticated = {user} />} />
           <Route path = "/internships" element = {<InternshipsListing isAuthenticated = {user} />} />
           <Route path = "/intern/:id/applications" element = {<MyApplications isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/intern/:id/saved_internships" element = {<SavedInternships isAuthenticated = {user} logout = {logout} />} />
         </Routes>
       </BrowserRouter>
     </div>

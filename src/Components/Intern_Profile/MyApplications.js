@@ -58,12 +58,12 @@ function MyApplications(props) {
         <div className="container my-5">
             <h1 className="heading text-center fw-bold">My Applications</h1>
             <div className = "row mt-5">
-                <div className = "col-12 col-lg-4">
+                <div className = "col-12 col-md-4">
                     <InternProfileNavbar logout = {props.logout} />
                 </div>
 
-                <div className = "col-12 col-lg-8">
-                    <h4 className="fw-bold">APPLIED INTERNSHIPS</h4>
+                <div className = "col-12 col-md-8">
+                    <h3 className="fw-bold">Applied Internships</h3>
                     <div className = "row mt-4 table-responsive posted-internships-table">
                         <table className="table align-middle">
                             <thead className = "table-light">

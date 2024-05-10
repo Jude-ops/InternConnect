@@ -777,6 +777,54 @@ app.get('/document/:id', (req, res) => {
     });
 });
 
+app.post("/intern/:id/saved-internships", (req,res) => {
+    
+    const internID = req.params.id;
+    const {internship_ID} = req.body;
+
+    db.query('INSERT INTO saved_internships (internship_ID, intern_ID) VALUES (?,?) ', [internship_ID, internID], (err, result) => {
+
+        if(err){
+
+            console.log("Error inserting the data into the database!", err);
+            return;
+
+        }
+
+        console.log("Saved internship data inserted successfully!", result);
+        res.send({message: "Saved internship data inserted successfully!"});
+
+    });
+    
+});
+
+app.get("/intern/:id/saved-internships", (req,res) => {
+
+    const internID = req.params.id;
+
+    //Join internships and saved_internships tables to get the saved internships
+
+    const query = `
+        SELECT internships.* FROM saved_internships
+        INNER JOIN internships ON saved_internships.internship_ID = internships.internship_ID
+        WHERE saved_internships.intern_ID = ?
+    `;
+
+    db.query(query, [internID], (err, result) => {
+
+        if(err){
+
+            console.log("Error selecting the data from the database!", err);
+            return;
+
+        }
+
+        console.log("Saved internships data selected successfully!", result);
+        return res.json(result);
+
+    });
+
+});
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}...`);

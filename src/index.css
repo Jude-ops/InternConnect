@@ -13,6 +13,12 @@ body{
     background-size: cover;
     background-position: center;
     background-color: #F3F6F9 !important;
+
+}
+
+img{
+    max-width: 100% !important;
+    height: auto !important;
 }
 
 .slick-slide > div{

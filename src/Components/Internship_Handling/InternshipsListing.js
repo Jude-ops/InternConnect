@@ -3,10 +3,12 @@ import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import SubHeader from '../Homepage/SubHeader';
 
 function InternshipsListing(props) {
 
     const [internships, setInternships] = useState([]);
+    const [internID, setInternID] = useState(null);
     const [filteredInternships, setFilteredInternships] = useState([]);
     const [searchKeyword, setSearchKeyword] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,6 +31,10 @@ function InternshipsListing(props) {
     }
 
     useEffect(() => {
+
+        const internID = localStorage.getItem("internID");
+        setInternID(internID);
+
        async function fetchInternships(){
            try{
                const response = await axios.get("http://localhost:5000/internships");
@@ -118,14 +124,32 @@ function InternshipsListing(props) {
         setSearchKeyword("");
     }
 
+    async function saveInternship(internshipID){
+        try{
+            const response = await axios.post(`http://localhost:5000/intern/${internID}/saved-internships`, {
+                internship_ID: internshipID,
+            });
+
+            alert(response.data.message);
+
+        }catch(err){
+            console.log("Error saving internship:", err);
+        }
+    }
+
   return (
     <div>
       <Header isAuthenticated = {props.isAuthenticated} />
+
+        <SubHeader 
+            title = "Internships" 
+            subtitle = "Find the best internships that suit your career goals"
+        />
+
       <div className="container my-5" style = {{width: "75%"}}>
-        <h2 className="heading text-center fw-bold">Internships</h2>
         <div className="row mt-5">
           <div className="col-12">
-            <h3 className="h3 fw-bold">Internships Available</h3>
+            <h3 className="h3 fw-bold">{internships.length} Total Internships Available</h3>
             <p className="fst-italic"><span className="fw-bold">Note:</span> Internships are updated regularly. Check back often for new listings.</p>
           </div>
         </div>
@@ -341,26 +365,63 @@ function InternshipsListing(props) {
                                 </div>
                                 
                                 <div className = "d-flex justify-content-between align-items-center">
-                                    <span className="card-text"><small className = "text-muted">{internship.location_city}</small></span>
-                                    <span className="card-text"><small className = "text-muted">{
-                                            (() => {
-                                                const start = new Date(internship.start_date);
-                                                const end = new Date(internship.end_date);
+                                    <span className="card-text">
+                                        <small className = "text-muted">
+                                        <i className="bi bi-geo-alt-fill me-2"></i>
+                                        {internship.location_city}
+                                        </small>
+                                    </span>
+                                    <span className="card-text">
+                                        <small className = "text-muted">
+                                            <i className="bi bi-calendar-range me-2"></i>
+                                            {
+                                                (() => {
+                                                    const start = new Date(internship.start_date);
+                                                    const end = new Date(internship.end_date);
 
-                                                const startYear = start.getFullYear();
-                                                const startMonth = start.getMonth();
+                                                    const startYear = start.getFullYear();
+                                                    const startMonth = start.getMonth();
 
-                                                const endYear = end.getFullYear();
-                                                const endMonth = end.getMonth();
+                                                    const endYear = end.getFullYear();
+                                                    const endMonth = end.getMonth();
 
-                                                return (endYear - startYear) * 12 + (endMonth - startMonth) + " months";
-                                            })()
-                                            }</small></span>
-                                    <span className="card-text"><small className = "text-muted">Start Date: {new Date(internship.start_date).toDateString()}</small></span>
+                                                    return (endYear - startYear) * 12 + (endMonth - startMonth) + " months";
+                                                })()
+                                            }
+                                        </small>
+                                    </span>
+
+                                    <span className="card-text">
+                                        <small className = "text-muted">
+                                            <i className="bi bi-clock me-2"></i>
+                                            {
+                                                new Date(internship.posted_On).toLocaleDateString() === new Date().toLocaleDateString() ? "Posted Today" 
+                                                : 
+                                                (()=> {
+                                                    const datePosted = new Date(internship.posted_On);
+                                                    const dateToday = new Date();
+                                                    const daysSincePosted = Math.floor((dateToday - datePosted) / (1000 * 60 * 60 * 24));
+                                                    return `Posted ${daysSincePosted} days ago`;
+                                                
+                                                })()
+                                            }
+                                        </small>
+                                    </span>
+
+                                    <span className="card-text">
+                                        <small className = "text-muted">
+                                            <i className="bi bi-calendar2-check-fill me-2"></i>
+                                            Start Date: {new Date(internship.start_date).toDateString()}
+                                        </small>
+                                    </span>
+                                </div>
+
+                                <div className = "d-flex justify-content-end mt-4">
+                                    <div><i className = "bi bi-heart h3 me-4 save-internship-icon" onClick={() =>{saveInternship(internship.internship_ID)}}></i></div>
                                     <Link to = {`/internship/${internship.internship_ID}`}><button className="btn btn-primary btn-sm">View Details</button></Link>
                                 </div>
 
-                                <span className="card-text mt-3"><small className = "text-muted">Posted Date: {new Date(internship.posted_On).toDateString()}</small></span>
+                                
                             </div>
                         </div>
                     ))}
