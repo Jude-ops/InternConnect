@@ -4,6 +4,7 @@ import Footer from '../Homepage/Footer'
 import InternProfileNavbar from './InternProfileNavbar'
 import axios from 'axios'
 import { Link, useParams } from 'react-router-dom';
+import SubHeader from '../Homepage/SubHeader'
 
 
 function MyApplications(props) {
@@ -50,11 +51,13 @@ function MyApplications(props) {
 
     }, [applications]);
 
-    console.log(internshipDetails)
-
   return (
     <div>
         <Header isAuthenticated = {props.isAuthenticated} />
+        <SubHeader 
+            title = "My Applications"
+            subtitle = "View all your applications here"
+        />
         <div className="container my-5">
             <h1 className="heading text-center fw-bold">My Applications</h1>
             <div className = "row mt-5">

@@ -9,6 +9,7 @@ function InternProfileNavbar(props) {
             
             const internID = localStorage.getItem("internID");
             setInternID(internID);
+
     }, []);
 
   return (

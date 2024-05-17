@@ -5,6 +5,7 @@ function SubHeader(props) {
 
     const location = useLocation();
     const pathnames = location.pathname.split("/").filter((x) => x);
+    const filteredPathnames = pathnames.filter((name) => isNaN(Number(name)));
 
     const [userType, setUserType] = useState("");
 
@@ -43,21 +44,21 @@ function SubHeader(props) {
                     <div className = "col-12 d-flex justify-content-center">
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb">
-                                <li className="breadcrumb-item active" aria-current = "page">
+                                <li className="breadcrumb-item active link-breadcrumb" aria-current = "page">
                                     <Link to = "/" className = "text-white nav-link">Home</Link>
                                 </li>
 
                                 {
-                                    pathnames.map((name, index) => {
+                                    filteredPathnames.map((name, index) => {
                                         const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
                                         const valueCapitalized = name.charAt(0).toUpperCase() + name.slice(1);
                                         const isLast = index === pathnames.length - 1;
                                         return isLast ? (
-                                            <li className = "breadcrumb-item active" aria-current = "page" key = {index}>
+                                            <li className = "breadcrumb-item active link-breadcrumb" aria-current = "page" key = {index}>
                                                 {valueCapitalized}
                                             </li>
                                         ) : (
-                                            <li className = "breadcrumb-item" key = {index}>
+                                            <li className = "breadcrumb-item link-breadcrumb" key = {index}>
                                                 <Link to = {routeTo} className = "text-white nav-link">{valueCapitalized}</Link>
                                             </li>
                                         );

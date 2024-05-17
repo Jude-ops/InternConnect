@@ -66,14 +66,13 @@ function InternshipDetails(props) {
 
             const formData = new FormData();
             const resume = fileInput.current.files[0];
+
             formData.append("resume", resume);
-            formData.append("internID", internID);
             formData.append("companyID", internshipDetails[0].company_ID);
-            formData.append("fullName", application.fullName);
-            formData.append("email", application.email);
-            formData.append("phone", application.phone);
-            formData.append("coverletter", application.coverletter);
-            formData.append("applicationStatus", application.applicationStatus);
+            
+            for (let key in application) {
+                formData.append(key, application[key]);
+            }
 
             const response = await axios.post(`http://localhost:5000/internship/${id}/apply`, formData, {
                 headers: {

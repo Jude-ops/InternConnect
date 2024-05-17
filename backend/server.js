@@ -20,7 +20,7 @@ app.use(cors()); //This is used to allow cross-origin requests
 app.use(bodyParser.urlencoded({extended: true})); //This is used to parse the data from the form
 app.use(bodyParser.json()); //This is used to parse the data from the form
 app.use(express.static("public")); //This is used to serve static files like css, images, etc.
-
+app.use('/uploads', express.static('uploads')); // Serve uploaded files
 
 
 // Middleware to verify the token and decode it
@@ -95,11 +95,11 @@ app.post("/register/intern", (req, res) => {
     isActive = true;
     const userType = "intern";
 
-    const {firstName, lastName, dateOfBirth, emailAddress, password, location, address, school, department, gender, telephone} = req.body;
+    const {firstName, lastName, dateOfBirth, age, professionalTitle, description, emailAddress, password, location, address, school, department, gender, telephone} = req.body;
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        db.query('INSERT INTO interns (first_name,last_name,date_of_birth,email_address,password,location,address,school,department,gender,telephone,is_Active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, emailAddress,hash,location, address, school, department,gender,parseInt(telephone),isActive], (err, result) => {
+        db.query('INSERT INTO interns (first_name,last_name,date_of_birth, age, professional_title, short_bio, email_address,password,location,address,school,department,gender,telephone,is_Active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, age, professionalTitle, description, emailAddress,hash,location, address, school, department,gender,parseInt(telephone),isActive], (err, result) => {
 
             if(err){
 
@@ -229,10 +229,32 @@ app.post("/login", (req,res) => {
 });
 
 //Update intern information
-app.put("/update/intern/:id", (req, res) => {
+app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
 
     const id = req.params.id;
-    const {emailAddress, password, location, address, telephone} = req.body;
+    let profileImage;
+    if(req.file){
+        profileImage = req.file.originalname;
+    };
+
+    const {
+        fullName, 
+        emailAddress, 
+        dateOfBirth, 
+        age, 
+        professionalTitle, 
+        description, 
+        password, 
+        location, 
+        address, 
+        telephone, 
+        school, 
+        department,
+    } = req.body;
+
+    const names = fullName.split(" ");
+    const firstName = names[0];
+    const lastName = names[1];
 
     // First, get the intern_ID from the users table
 
@@ -252,9 +274,27 @@ app.put("/update/intern/:id", (req, res) => {
             // Then, update the intern information
             bcrypt.hash(password, saltRounds, (err, hash) => {
 
-                const data = [emailAddress, hash, location, address, parseInt(telephone)];
+                const data = [
+                        firstName, 
+                        lastName, 
+                        dateOfBirth, 
+                        age, 
+                        professionalTitle, 
+                        description,
+                        emailAddress, 
+                        hash, 
+                        location, 
+                        address,
+                        school,
+                        department,
+                        parseInt(telephone),
+                    ];
+
+                if(profileImage){
+                    data.push(profileImage);
+                }
             
-                db.query('UPDATE interns SET `email_address` = ?, `password` = ?, `location` = ?, `address` = ?, `telephone` = ? WHERE intern_ID = ?', [...data, internID], (err, result) => {
+                db.query(`UPDATE interns SET first_name = ?, last_name = ?, date_of_birth = ?, age = ?, professional_title = ?, short_bio = ?, email_address = ?, password = ?, location = ?, address = ?, school = ?, department = ?, telephone = ?${profileImage ? ', profile_image = ?' : ''} WHERE intern_ID = ?`, [...data, internID], (err, result) => {
         
                     if(err){
         
@@ -686,6 +726,20 @@ app.delete("/company/:id/internship/:internshipID/delete", (req,res) => {
 
 });
 
+//Get intern info to update profile information
+app.get("/intern/:id", (req,res) => {
+    const internID = req.params.id;
+    db.query('SELECT * FROM interns WHERE intern_ID = ?', [internID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Intern data selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Get intern info to apply for internship
 app.get("/intern/info/:internID", (req,res) => {
 
     const internID = req.params.internID;

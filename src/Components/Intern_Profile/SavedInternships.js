@@ -4,6 +4,7 @@ import Footer from '../Homepage/Footer'
 import InternProfileNavbar from './InternProfileNavbar'
 import axios from 'axios'
 import { Link, useParams } from 'react-router-dom';
+import SubHeader from '../Homepage/SubHeader'
 
 function SavedInternships(props) {
 
@@ -29,6 +30,10 @@ function SavedInternships(props) {
   return (
     <div>
         <Header isAuthenticated = {props.isAuthenticated} />
+        <SubHeader 
+            title = "Saved Internships"
+            subtitle = "View all your saved internships here"
+        />
         <div className="container my-5">
             <h1 className="heading text-center fw-bold">Saved Internships</h1>
             <div className = "row mt-5">
