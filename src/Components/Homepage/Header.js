@@ -72,7 +72,7 @@ function Header(props){
                             <div className = "d-flex">
 
                                 {
-                                    userType === "company" && <Link to = "/post_internship"><button type="button" className="btn btn-outline-primary me-2">Post Internship</button></Link>
+                                    userType === "company" && <Link to = "/post_internship"><button type="button" className="btn me-2" id = "post-internship-button"><i className = "bi bi-upload me-2"></i>Post Internship</button></Link>
                                 }
 
                                 <div class="dropdown">
@@ -122,7 +122,18 @@ function Header(props){
                                                         Manage Internships
                                                     </a>
                                                 </li>
-                                                <li><a class = "dropdown-item" href = {`/company/${companyID}/received_applications`}>Received Applications</a></li>
+                                                <li>
+                                                    <a class = "dropdown-item" href = {`/company/${companyID}/received_applications`}>
+                                                        <i class = "bi bi-journal-text me-2"></i>
+                                                        Received Apps.
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href={`/company/${companyID}/public_profile`}>
+                                                        <i class="bi bi-person-circle me-2"></i>
+                                                        Public Profile
+                                                    </a>
+                                                </li>  
                                             </div>    
                                         }
                                         <li>

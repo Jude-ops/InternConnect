@@ -63,7 +63,7 @@ function RegistrationCompany(props){
                 localStorage.setItem("companyID", companyID);
                 props.setCompanyID(companyID);
                 
-                navigate("/");
+                navigate(`/update/company/${companyID}`);
 
             };
 
@@ -84,7 +84,7 @@ function RegistrationCompany(props){
                 subtitle = "Hire interns and freshers faster on InternConnect!"
             />
             <div className = "container my-5 p-3">
-                <h3 className = "text-center fw-bold h3-responsive">Hire interns and freshers faster on InternConnect! </h3>
+                <h3 className = "text-center fw-bold h3-responsive">Company Registration Portal</h3>
                 <div className = "row mt-4">
                     <div className = "col-12">
                         <form className = "registration-form" style = {{width: "75%"}} method = "post" action = "/register/company">

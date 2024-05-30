@@ -236,34 +236,6 @@ function RegistrationIntern(props){
                                 </div>
                             </div>
 
-                            {/*<div className = "row">
-                                <div className = "col-12 col-sm-6">
-                                    <FormElement 
-                                        labelFor = "school" 
-                                        type = "text" 
-                                        id = "school" 
-                                        name = "school" 
-                                        labelTitle = "School"
-                                        placeholder = "e.g. NAHPI Bambili"
-                                        onChange = {handleChange}
-                                        value = {internInfo.school}
-                                    />
-                                </div>
-
-                                <div className = "col-12 col-sm-6">
-                                    <FormElement 
-                                        labelFor = "department" 
-                                        type = "text" 
-                                        id = "department" 
-                                        name = "department" 
-                                        labelTitle = "Department"
-                                        placeholder = "e.g. Computer Engineering"
-                                        onChange = {handleChange}
-                                        value = {internInfo.department}
-                                    />
-                                </div>
-                            </div>*/}
-
                             <div className = "row">
                                 <div className = "col-12 col-sm-6">
                                     <div className="mb-3">

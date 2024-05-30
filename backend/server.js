@@ -169,7 +169,7 @@ app.post("/register/company", (req, res) => {
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        db.query('INSERT INTO companies (company_name,company_email,founded_date,website,password,location_city,address,telephone,is_Active, company_description, registration_date) VALUES (?,?,?,?,?,?,?,?,?,?,?) ', [fullName, emailAddress, dateFounded, website, hash, location, address, parseInt(telephone), isActive, description], (err, result) => {
+        db.query('INSERT INTO companies (company_name,company_email,founded_date,website,password,location_city,address,telephone,is_Active, company_description, registration_date) VALUES (?,?,?,?,?,?,?,?,?,?,?) ', [fullName, emailAddress, dateFounded, website, hash, location, address, parseInt(telephone), isActive, description, new Date()], (err, result) => {
             
             if(err){
 
@@ -352,11 +352,39 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
 
 });
 
+//Get company info to update profile info
+app.get("/company/:id", (req,res) => {
+    const companyID = req.params.id;
+    db.query('SELECT * FROM companies WHERE company_ID = ?', [companyID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Company data selected successfully!");
+        return res.json(result);
+    });
+});
+
 //Update company information
-app.put("/update/company/:id", (req, res) => {
+app.put("/update/company/:id", upload.single("profileImage"), (req, res) => {
 
     const id = req.params.id;
-    const {emailAddress, password, telephone} = req.body;
+    let profileImage;
+    if(req.file){
+        profileImage = req.file.originalname;
+    };
+
+    const {
+        fullName,
+        emailAddress,
+        foundedDate,
+        website,
+        password,
+        location,
+        address,
+        telephone,
+        description
+    } = req.body;
 
     // First, get the company_ID from the users table
     db.query('SELECT company_ID FROM users WHERE user_ID = ?', [id], (err, result) => {
@@ -373,13 +401,27 @@ app.put("/update/company/:id", (req, res) => {
             // Then, update the company information
             bcrypt.hash(password, saltRounds, (err, hash) => {
 
-                const data = [emailAddress, hash, parseInt(telephone)];
+                const data = [
+                    fullName,
+                    emailAddress,
+                    foundedDate,
+                    website, 
+                    hash,
+                    location,
+                    address, 
+                    parseInt(telephone),
+                    description
+                ];
+
+                if(profileImage){
+                    data.push(profileImage);
+                }
             
-                db.query('UPDATE companies SET `company_email` = ?, `password` = ?, `telephone` = ? WHERE company_ID = ?', [...data, companyID], (err, result) => {
+                db.query(`UPDATE companies SET company_name = ?, company_email = ?, founded_date = ?, website = ?, password = ?, location_city = ?, address = ?, telephone = ?, company_description = ?${profileImage ? ', profile_image = ?' : ''} WHERE company_ID = ?`, [...data, companyID], (err, result) => {
         
                     if(err){
         
-                        console.log("Error updating the data in the database!", err);
+                        console.log("Error updating the company data in the database!", err);
                         return;
         
                     }

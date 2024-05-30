@@ -5,11 +5,9 @@ function InternProfileNavbar(props) {
 
     const [internID, setInternID] = useState(null);
 
-    useEffect(() => {
-            
-            const internID = localStorage.getItem("internID");
-            setInternID(internID);
-
+    useEffect(() => {         
+        const internID = localStorage.getItem("internID");
+        setInternID(internID);
     }, []);
 
   return (
@@ -43,8 +41,7 @@ function InternProfileNavbar(props) {
             <a href="/" className="list-group-item list-group-item-action" onClick = {props.logout}>
                 <i className = "bi bi-box-arrow-right me-3"></i>
                 Logout
-            </a>
-            
+            </a>        
         </div>
     </div>
   )
