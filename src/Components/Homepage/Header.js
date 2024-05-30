@@ -102,7 +102,7 @@ function Header(props){
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item" href={`/intern/${internID}/applications`}>
+                                                    <a class="dropdown-item" href={`/intern/${internID}/public_profile`}>
                                                         <i class="bi bi-person-circle me-2"></i>
                                                         Public Profile
                                                     </a>
@@ -136,7 +136,7 @@ function Header(props){
                             </div> 
                             : 
                             <div className="d-flex">
-                                <Link to = "/login"><button type="button" className="btn btn-outline-primary me-2">Login</button></Link>
+                                <Link to = "/login"><button type="button" className="btn me-2" id = "login-button">Login</button></Link>
                                 <div class="btn-group">
                                     <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Register

@@ -95,11 +95,27 @@ app.post("/register/intern", (req, res) => {
     isActive = true;
     const userType = "intern";
 
-    const {firstName, lastName, dateOfBirth, age, professionalTitle, description, emailAddress, password, location, address, school, department, gender, telephone} = req.body;
+    const {
+            firstName, 
+            lastName, 
+            dateOfBirth, 
+            age, 
+            professionalTitle, 
+            description,
+            skills, 
+            emailAddress, 
+            password, 
+            location, 
+            address, 
+            school, 
+            department, 
+            gender, 
+            telephone
+        } = req.body;
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        db.query('INSERT INTO interns (first_name,last_name,date_of_birth, age, professional_title, short_bio, email_address,password,location,address,school,department,gender,telephone,is_Active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, age, professionalTitle, description, emailAddress,hash,location, address, school, department,gender,parseInt(telephone),isActive], (err, result) => {
+        db.query('INSERT INTO interns (first_name,last_name,date_of_birth, age, professional_title, short_bio, skills, email_address,password,location,address,school,department,gender,telephone,is_Active, registration_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, age, professionalTitle, description, skills, emailAddress,hash,location, address, school, department,gender,parseInt(telephone),isActive, new Date()], (err, result) => {
 
             if(err){
 
@@ -112,7 +128,6 @@ app.post("/register/intern", (req, res) => {
 
             // Get the internID of the newly inserted intern
             const internID = result.insertId;
-            const firstName = result[0].first_name;
 
             db.query('INSERT INTO users (username,email,password,user_type,is_Active,intern_ID) VALUES (?,?,?,?,?,?) ', [firstName.concat(lastName),emailAddress,hash,userType,isActive,internID], (err, result) => {
 
@@ -125,7 +140,7 @@ app.post("/register/intern", (req, res) => {
     
                 console.log("User data inserted successfully!", result);
                 const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                res.status(200).json({token, userType, firstName}); 
+                res.status(200).json({token, userType, firstName, internID}); 
     
             });
 
@@ -142,11 +157,21 @@ app.post("/register/company", (req, res) => {
     isActive = true;
     const userType = "company";
 
-    const {fullName, emailAddress, password, location, address, telephone, description} = req.body;
+    const {
+            fullName, 
+            emailAddress,
+            dateFounded,
+            website, 
+            password, 
+            location, 
+            address, 
+            telephone, 
+            description
+        } = req.body;
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        db.query('INSERT INTO companies (company_name,company_email,password,location_city,address,telephone,is_Active, company_description) VALUES (?,?,?,?,?,?,?.?) ', [fullName, emailAddress, hash, location, address, parseInt(telephone), isActive, description], (err, result) => {
+        db.query('INSERT INTO companies (company_name,company_email,founded_date,website,password,location_city,address,telephone,is_Active, company_description, registration_date) VALUES (?,?,?,?,?,?,?,?,?,?,?) ', [fullName, emailAddress, dateFounded, website, hash, location, address, parseInt(telephone), isActive, description], (err, result) => {
             
             if(err){
 
@@ -171,7 +196,7 @@ app.post("/register/company", (req, res) => {
     
                 console.log("User data inserted successfully!", result);
                 const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                res.status(200).json({token, userType});
+                res.status(200).json({token, userType, companyID, fullName});
     
             });
 
@@ -243,7 +268,8 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
         dateOfBirth, 
         age, 
         professionalTitle, 
-        description, 
+        description,
+        skills, 
         password, 
         location, 
         address, 
@@ -281,6 +307,7 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
                         age, 
                         professionalTitle, 
                         description,
+                        skills,
                         emailAddress, 
                         hash, 
                         location, 
@@ -294,7 +321,7 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
                     data.push(profileImage);
                 }
             
-                db.query(`UPDATE interns SET first_name = ?, last_name = ?, date_of_birth = ?, age = ?, professional_title = ?, short_bio = ?, email_address = ?, password = ?, location = ?, address = ?, school = ?, department = ?, telephone = ?${profileImage ? ', profile_image = ?' : ''} WHERE intern_ID = ?`, [...data, internID], (err, result) => {
+                db.query(`UPDATE interns SET first_name = ?, last_name = ?, date_of_birth = ?, age = ?, professional_title = ?, short_bio = ?, skills = ?, email_address = ?, password = ?, location = ?, address = ?, school = ?, department = ?, telephone = ?${profileImage ? ', profile_image = ?' : ''} WHERE intern_ID = ?`, [...data, internID], (err, result) => {
         
                     if(err){
         
@@ -464,8 +491,8 @@ app.delete("/delete/company/:id", (req, res) => {
 
         if(err){
 
-        console.log("Error fetching company ID from the database!", err);
-        return res.status(500).json({ message: 'Error fetching company ID from the database' });
+            console.log("Error fetching company ID from the database!", err);
+            return res.status(500).json({ message: 'Error fetching company ID from the database' });
 
         }
 
@@ -726,7 +753,7 @@ app.delete("/company/:id/internship/:internshipID/delete", (req,res) => {
 
 });
 
-//Get intern info to update profile information
+//Get intern info to update profile info
 app.get("/intern/:id", (req,res) => {
     const internID = req.params.id;
     db.query('SELECT * FROM interns WHERE intern_ID = ?', [internID], (err, result) => {
@@ -736,6 +763,88 @@ app.get("/intern/:id", (req,res) => {
         }
         console.log("Intern data selected successfully!");
         return res.json(result);
+    });
+});
+
+//Get intern education info to update profile info
+app.get("/intern/:id/education", (req,res) => {
+    const internID = req.params.id;
+    db.query('SELECT * FROM education_history WHERE intern_ID = ?', [internID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Education data selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Get intern experience info to update profile info
+app.get("/intern/:id/work_experience", (req,res) => {
+    const internID = req.params.id;
+    db.query('SELECT * FROM work_history WHERE intern_ID = ?', [internID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Work Experience data selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Update intern education info
+app.put("/update/intern/:internID/education/:educationID", (req,res) => {
+    const internID = req.params.internID;
+    const educationID = req.params.educationID;
+    const {
+        school_name, 
+        department, 
+        degree, 
+        end_date, 
+    } = req.body;
+
+    const data = [
+        school_name, 
+        department, 
+        degree, 
+        end_date
+    ];
+
+    db.query('UPDATE education_history SET school_name = ?, department = ?, degree = ?, end_date = ? WHERE intern_ID = ? AND education_id = ?', [...data, internID, educationID], (err, result) => {
+        if(err){
+            console.log("Error updating the education data in the database!", err);
+            return;
+        }
+        console.log("Education data updated successfully!", result);
+        res.send({message: "Education data updated successfully!"});
+    });
+});
+
+//Update intern experience info
+app.put("/update/intern/:internID/work_experience/:workExperienceID", (req,res) => {
+    const internID = req.params.internID;
+    const workExperienceID = req.params.workExperienceID;
+    const {
+        company_name, 
+        position, 
+        start_date, 
+        end_date, 
+    } = req.body;
+
+    const data = [
+        company_name, 
+        position, 
+        start_date, 
+        end_date
+    ];
+
+    db.query('UPDATE work_history SET company_name = ?, position = ?, start_date = ?, end_date = ? WHERE intern_ID = ? AND work_id = ?', [...data, internID, workExperienceID], (err, result) => {
+        if(err){
+            console.log("Error updating the work history data in the database!", err);
+            return;
+        }
+        console.log("Work Experience data updated successfully!", result);
+        res.send({message: "Work Experience data updated successfully!"});
     });
 });
 
@@ -791,10 +900,11 @@ app.post('/internship/:id/apply', upload.single('resume'), (req, res) => {
         phone,
         coverletter,
         resume,
-        applicationStatus
+        applicationStatus,
+        new Date() // Date of application
     ];
 
-    db.query('INSERT INTO applications (intern_ID, company_ID, internship_ID, full_name, email, phone, cover_letter, resume, application_status) VALUES (?,?,?,?,?,?,?,?,?) ', [...data], (err, result) => {
+    db.query('INSERT INTO applications (intern_ID, company_ID, internship_ID, full_name, email, phone, cover_letter, resume, application_status, date_applied) VALUES (?,?,?,?,?,?,?,?,?,?) ', [...data], (err, result) => {
         
         if(err){
 
@@ -817,14 +927,14 @@ app.post('/internship/:id/apply', upload.single('resume'), (req, res) => {
 });
 
 //Route to retrieve and get a file
-app.get('/document/:id', (req, res) => {
-    const fileId = req.params.id;
-    const sql = 'SELECT filepath FROM files WHERE id = ?';
-    db.query(sql, fileId, (err, result) => {
+app.get('/document/:internID', (req, res) => {
+    const internID = req.params.internID;
+    const sql = 'SELECT document_path FROM documents WHERE intern_ID = ?';
+    db.query(sql, [internID], (err, result) => {
         if (err) throw err;
         if (result.length > 0) {
-            const filepath = result[0].filepath;
-            res.sendFile(filepath); // Serve the file
+            const filepath = result[0].document_path;
+            res.download(filepath); // Serve the file
         } else {
             res.status(404).send('File not found');
         }

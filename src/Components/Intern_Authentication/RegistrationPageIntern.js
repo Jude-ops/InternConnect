@@ -3,6 +3,7 @@ import Header from "../Homepage/Header";
 import Footer from "../Homepage/Footer";
 import {Link,useNavigate} from "react-router-dom";
 import FormElement from "../Form_Elements/FormElement";
+import SubHeader from "../Homepage/SubHeader";
 import axios from "axios";
 
 function RegistrationIntern(props){
@@ -12,6 +13,10 @@ function RegistrationIntern(props){
     const [internInfo,setInternInfo] = useState({
         firstName: "",
         lastName: "",
+        age: "",
+        professionalTitle: "",
+        description: "",
+        skills: "",
         dateOfBirth: "",
         emailAddress: "",
         password: "",
@@ -46,6 +51,8 @@ function RegistrationIntern(props){
 
             if(response.data.token){
 
+                console.log("Registration successful:", response.data)
+
                 const token = response.data.token;
                 localStorage.setItem("token", token);
                 props.setToken(token);
@@ -53,6 +60,10 @@ function RegistrationIntern(props){
                 const userType = response.data.userType;
                 localStorage.setItem("userType", userType);
                 props.setUserType(userType);
+
+                const internID = response.data.internID;
+                localStorage.setItem("internID", internID);
+                props.setInternID(internID);
 
                 navigate("/");
 
@@ -70,11 +81,15 @@ function RegistrationIntern(props){
     return(
         <div>
             <Header isAuthenticated = {props.isAuthenticated} />
-            <div className = "container my-5 mx-auto p-3" style = {{width:"480px"}}>
-                <h3 className = "text-center fw-bold h3-responsive">Sign-up and apply for free on InternConnect!</h3>
+            <SubHeader
+                title = "Intern Registration"
+                subtitle = "Sign Up and Apply for free on InternConnect!"
+            />
+            <div className = "container my-5 mx-auto p-3">
+                <h2 className = "text-center fw-bold">Intern Registration Portal</h2>
                 <div className = "row mt-4">
-                        <form className = "registration-form" method = "post" action = "/register/intern">
-
+                    <div className = "col-12">
+                        <form className = "registration-form" style = {{width: "75%"}} method = "post" action = "/register/intern">
                             <div  className = "row">
                                 <div className = "col-12 col-sm-6">
                                     <FormElement 
@@ -105,6 +120,32 @@ function RegistrationIntern(props){
                             <div  className = "row">
                                 <div className = "col-12 col-sm-6">
                                     <FormElement 
+                                        labelFor = "emailAddress" 
+                                        type = "email" 
+                                        id = "emailAddress" 
+                                        name = "emailAddress" 
+                                        labelTitle = "Email Address"
+                                        onChange = {handleChange}
+                                        value = {internInfo.emailAddress}
+                                    />
+                                </div>
+
+                                <div className = "col-12 col-sm-6">
+                                    <FormElement 
+                                        labelFor = "professionalTitle" 
+                                        type = "text" 
+                                        id = "professionalTitle" 
+                                        name = "professionalTitle" 
+                                        labelTitle = "Professional Title"
+                                        onChange = {handleChange}
+                                        value = {internInfo.professionalTitle}
+                                    />
+                                </div>
+                            </div>
+
+                            <div  className = "row">
+                                <div className = "col-12 col-sm-6">
+                                    <FormElement 
                                         labelFor = "dateOfBirth" 
                                         type = "date" 
                                         id = "dateOfBirth" 
@@ -116,16 +157,31 @@ function RegistrationIntern(props){
                                 </div>
 
                                 <div className = "col-12 col-sm-6">
-                                   <FormElement 
-                                        labelFor = "emailAddress" 
-                                        type = "email" 
-                                        id = "emailAddress" 
-                                        name = "emailAddress" 
-                                        labelTitle = "Email Address"
+                                    <FormElement 
+                                        labelFor = "age" 
+                                        type = "number" 
+                                        id = "age" 
+                                        name = "age" 
+                                        labelTitle = "Age"
                                         onChange = {handleChange}
-                                        value = {internInfo.emailAddress}
+                                        value = {internInfo.age}
                                     />
                                 </div>
+                            </div>
+
+                            <div className="mb-3">
+                                <label for="description" className="form-label fw-bold">Short Description</label>
+                                <textarea
+                                    className="form-control"
+                                    id="description"
+                                    name = "description"
+                                    placeholder = "Tell Us a Little About Yourself..."
+                                    rows="6"
+                                    value = {`${internInfo.description}`}
+                                    onChange = {(event) => {
+                                        handleChange(event.target.name, event.target.value)
+                                    }}
+                                ></textarea>
                             </div>
 
                             <div className = "row">
@@ -209,66 +265,86 @@ function RegistrationIntern(props){
                                     />
                                 </div>
                             </div>
-                            
-                            <div>
-                                <label>Gender</label>
-                            </div>
 
-                            <div className ="form-check form-check-inline mb-3">
-                                <input 
-                                    className ="form-check-input" 
-                                    type="radio" 
-                                    name="gender" 
-                                    id="male" 
-                                    value = "male" 
-                                    checked = {internInfo.gender === "male"} 
-                                    onChange = {(event) => {
-                                            handleChange(event.target.name,event.target.value)
-                                        }
-                                    } 
-                                    required
-                                />
-                                <label className ="form-check-label" for="male">Male</label>
-                            </div>
+                            <div className = "row">
+                                <div className = "col-12 col-sm-6">
+                                    <div className="mb-3">
+                                        <label for="skillsRequired" class="form-label fw-bold">My Skill(s)</label>
+                                        <textarea
+                                            className="form-control"
+                                            placeholder = "e.g. Web Development, Graphic Design, etc." 
+                                            id="skills" 
+                                            rows="4" 
+                                            value = {`${internInfo.skills}`}
+                                            name = "skills"
+                                            onChange={(event) => {
+                                                handleChange(event.target.name, event.target.value)
+                                            }}
+                                        ></textarea> 
+                                    </div>
+                                </div>
 
-                            <div className ="form-check form-check-inline mb-3">
-                                <input 
-                                    className ="form-check-input" 
-                                    type="radio" 
-                                    name="gender" 
-                                    id="female" 
-                                    value = "female" 
-                                    checked = {internInfo.gender === "female"} 
-                                    onChange = {(event) => {
-                                            handleChange(event.target.name,event.target.value)
-                                        }
-                                    } 
-                                    required
-                                />
-                                <label className ="form-check-label" for="female">Female</label>
-                            </div>
+                                <div className = "col-12 col-sm-6">
+                                    <FormElement 
+                                        labelFor = "telephone" 
+                                        type = "tel" 
+                                        id = "telephone" 
+                                        name = "telephone" 
+                                        labelTitle = "Telephone"
+                                        placeholder = "e.g. 678123456"
+                                        onChange = {handleChange}
+                                        value = {internInfo.telephone}
+                                    />
 
-                            <FormElement 
-                                labelFor = "telephone" 
-                                type = "tel" 
-                                id = "telephone" 
-                                name = "telephone" 
-                                labelTitle = "Telephone"
-                                placeholder = "e.g. 678123456"
-                                onChange = {handleChange}
-                                value = {internInfo.telephone}
-                            />
-                          
+                                    <div>
+                                        <label>Gender</label>
+                                    </div>
+
+                                    <div className ="form-check form-check-inline mb-3">
+                                        <input 
+                                            className ="form-check-input" 
+                                            type="radio" 
+                                            name="gender" 
+                                            id="male" 
+                                            value = "male" 
+                                            checked = {internInfo.gender === "male"} 
+                                            onChange = {(event) => {
+                                                    handleChange(event.target.name,event.target.value)
+                                                }
+                                            } 
+                                            required
+                                        />
+                                        <label className ="form-check-label" for="male">Male</label>
+                                    </div>
+
+                                    <div className ="form-check form-check-inline mb-3">
+                                        <input 
+                                            className ="form-check-input" 
+                                            type="radio" 
+                                            name="gender" 
+                                            id="female" 
+                                            value = "female" 
+                                            checked = {internInfo.gender === "female"} 
+                                            onChange = {(event) => {
+                                                    handleChange(event.target.name,event.target.value)
+                                                }
+                                            } 
+                                            required
+                                        />
+                                        <label className ="form-check-label" for="female">Female</label>
+                                    </div>
+                                </div>
+                            </div>
+                                   
                             <div id = "submitButton" className = "mt-5">
                                 <button type = "submit" className ="btn btn-primary" onClick = {handleSubmit}>Sign Up</button>
                             </div>
 
                             <div className = "text-center mt-3" style = {{fontSize: "14px"}}>
-                                Already registered? <Link to = "/login" style = {{textDecoration: "none"}}>Login</Link>
+                                Already registered? <Link to = "/login" style = {{textDecoration: "none", color: "#2980B9"}}>Login</Link>
                             </div>
-
                         </form>
-
+                    </div>
                 </div>
             </div>
             <Footer />

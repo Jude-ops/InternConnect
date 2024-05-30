@@ -8,8 +8,8 @@ function LoginIntern(props){
     const navigate = useNavigate();
 
     const style = {
-        color: props.clicked ? "#0B5ED7" : "black",
-        borderBottom: props.clicked ? "2px solid #0B5ED7" : "none"
+        color: props.clicked ? "#2980B9" : "black",
+        borderBottom: props.clicked ? "2px solid #2980B9" : "none",
     }
 
     const [internLoginInfo, setInternLoginInfo] = useState({
@@ -104,7 +104,7 @@ function LoginIntern(props){
                         />
 
                         <div className = "mb-3">
-                            <Link to = "/forgotpassword" style = {{textDecoration: "none"}}>Forgot Password?</Link>
+                            <Link to = "/forgotpassword" style = {{textDecoration: "none", color: "#2980B9"}}>Forgot Password?</Link>
                         </div>
 
                         <div id = "submitButton" className = "mt-5">
@@ -112,8 +112,8 @@ function LoginIntern(props){
                         </div>
 
                         <div className = "text-center mt-3" style = {{fontSize: "14px"}}>
-                            New to InternConnect? Register here: <Link to  = "/register/intern" style = {{textDecoration: "none"}}>Intern</Link>
-                            /<Link to  = "/register/company" style = {{textDecoration: "none"}}>Company</Link>
+                            New to InternConnect? Register here: <Link to  = "/register/intern" style = {{textDecoration: "none", color: "#2980B9"}}>Intern</Link>
+                            /<Link to  = "/register/company" style = {{textDecoration: "none", color: "#2980B9"}}>Company</Link>
                         </div>
                         
                     </form>

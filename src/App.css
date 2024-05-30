@@ -3,6 +3,18 @@ header {
     min-height:72px;
 }
 
+#login-button{
+    background-color: white;
+    color: #2980B9;
+    border: 1px solid #2980B9;
+    transition: all 0.3s linear;
+}
+
+#login-button:hover{
+    background-color: #2980B9;
+    color: white;
+}
+
 .navbar-brand span{
     font-size: 20px;
     font-weight: bold;
@@ -47,7 +59,7 @@ footer ul span, header ul span{
     border: none;
     border-radius:10px;
     box-shadow:0px 0px 6px 0px rgba(0,0,0,0.15);
-    background-color: white;
+    /*background-color: white;*/
 }
 
 #submitButton{
@@ -126,7 +138,7 @@ textarea:focus{
 
 .logo{
     width: 65px;
-    height: 62.5px;
+    height: 65px;
     border: 1px solid #EEEFF1;
 }
 
@@ -305,4 +317,84 @@ input:focus, select:focus, textarea:focus{
 
 #profileImageUpload{
     display: none;
+}
+
+#public-profile{
+    padding: 70px 0px;
+    opacity: 1;
+    background-image: radial-gradient(#2980B9,#1d6290,#2b4e83);
+    color: white;
+}
+
+.public-profile-img img{
+    width: 150px;
+    height: 100% !important;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.download-resume a, .contact-me a{
+    cursor: pointer;
+    padding: 13px 33px;
+    background-color: #1facee;
+    border: 1px solid #1facee;
+    border-radius: 80px;
+    font-size: 18px;
+    color: white;
+}
+
+.download-resume a:hover{
+    background-color: #239cdd;
+    border: 1px solid #239cdd;
+    color: white;
+}
+
+.public-profile-overview{
+    padding: 30px;
+    border: 1px solid #EEEFF1;
+    border-radius: 10px;
+    box-shadow:0px 0px 6px 0px rgba(0,0,0,0.15);
+}
+
+.profile-skill{
+    padding: 8px;
+    border: 1px solid #EEEFF1;
+    border-radius: 8px;
+    background-color: #489ac0;
+    color: white;
+    margin: 0 2px;
+}
+
+.public-profile-details i, .public-profile-overview i{
+    color: #2980B9;
+}
+
+.hire-me-section button, .public-profile-overview button{
+    padding: 13px 33px;
+    background-color: #2980B9 !important;
+    border: 1px solid #2980B9 !important;
+    border-radius: 10px;
+    font-size: 18px;
+    color: white;
+    position: relative;
+    bottom: 0;
+    transition: all 0.3s linear;
+}
+
+#save-profile-button{
+    background-color: transparent !important;
+    color: #2980B9 !important;
+    border: 1px solid #2980B9 !important;
+}
+
+#save-profile-button:hover{
+    background-color: #2980B9 !important;
+    color: white !important;
+}
+
+.hire-me-section button:hover, .public-profile-overview button:hover{
+    background-color: #265c80 !important;
+    border: 1px solid #265c80 !important;
+    bottom: 5px;
+    color: white;
 }
