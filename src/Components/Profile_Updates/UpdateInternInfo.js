@@ -30,8 +30,6 @@ function UpdateInternInfo(props){
         confirmPassword: "",
         location: "",
         address: "",
-        school: "",
-        department: "",
         telephone: "",
     });
 
@@ -91,8 +89,6 @@ function UpdateInternInfo(props){
                             description: response.data[0].short_bio,
                             location: response.data[0].location,
                             address: response.data[0].address,
-                            school: response.data[0].school,
-                            department: response.data[0].department,
                             telephone: response.data[0].telephone,
                             skills: response.data[0].skills
                         }
@@ -202,29 +198,52 @@ function UpdateInternInfo(props){
 
     };
 
-    async function handleDelete(){
-
+    //Function to delete education history
+    async function handleDeleteEducation(index, educationID){
         try{
-
-            const response = await axios.delete("http://localhost:5000/delete/intern/" + id);
-
+            const response = await axios.delete(`http://localhost:5000/delete/intern/${internID}/education/${educationID}`);
             if(response){
+                console.log("Education history deleted successfully!");
+                //Remove the deleted education history from the state variable
+                const newEducationHistory = [...educationHistory];
+                newEducationHistory.splice(index, 1);
+                setEducationHistory(newEducationHistory);
+            }
+        } catch (error) {
+            console.error("Error deleting education history:", error);
+        }
+    }
 
+    //Function to delete work experience
+    async function handleDeleteWorkExperience(index, workID){
+        try{
+            const response = await axios.delete(`http://localhost:5000/delete/intern/${internID}/work_experience/${workID}`);
+            if(response){
+                console.log("Work experience deleted successfully!");
+                //Remove the deleted work experience from the state variable
+                const newWorkExperience = [...workExperience];
+                newWorkExperience.splice(index, 1);
+                setWorkExperience(newWorkExperience);
+            }
+        } catch (error) {
+            console.error("Error deleting work experience:", error);
+        }
+    }
+
+    //Delete intern account
+    async function handleDelete(){
+        try{
+            const response = await axios.delete("http://localhost:5000/delete/intern/" + id);
+            if(response){
                 localStorage.removeItem("token");
                 props.setToken("");
                 localStorage.removeItem("userType");
                 props.setUserType("");
-
                 navigate("/");
-
             }
-
         } catch (error) {
-
             console.error("Error deleting intern info:", error);
-
         }
-
     };
 
     return (
@@ -416,7 +435,10 @@ function UpdateInternInfo(props){
                             {educationHistory.map((education, index) => {
                                 return(
                                     <div className = "row mb-3" key = {index}>
-                                        <h6 className = "fw-bold h5-responsive" style = {{color: "#2980B9"}}>Education {index + 1}</h6>
+                                        <h6 className = "fw-bold h5-responsive" style = {{color: "#2980B9"}}>
+                                            Education {index + 1}
+                                            <i className = "bi bi-trash3 ms-3" style = {{cursor: "pointer"}} onClick = {() => handleDeleteEducation(index, education.education_id)}></i>
+                                        </h6>
                                         <div><hr className = "line-divider" style = {{width: "17%", marginTop:"0"}}/></div>
                                         <div className = "col-12 col-sm-6 mb-3">
                                             <label for="school" className="form-label fw-bold">School Name</label>
@@ -487,7 +509,10 @@ function UpdateInternInfo(props){
                             {workExperience.map((work, index) => {
                                 return(
                                     <div className = "row mb-3" key = {index}>
-                                        <h6 className = "fw-bold h5-responsive" style = {{color: "#2980B9"}}>Work Experience {index + 1}</h6>
+                                        <h6 className = "fw-bold h5-responsive" style = {{color: "#2980B9"}}>
+                                            Work Experience {index + 1}
+                                            <i className = "bi bi-trash3 ms-3" style = {{cursor: "pointer"}} onClick = {() => handleDeleteWorkExperience(index, work.work_id)}></i>
+                                        </h6>
                                         <div><hr className = "line-divider" style = {{width: "17%", marginTop:"0"}}/></div>
                                         <div className = "col-12 col-sm-6 mb-3">
                                             <label for = "companyName" className = "form-label fw-bold">Company Name</label>

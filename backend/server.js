@@ -107,15 +107,13 @@ app.post("/register/intern", (req, res) => {
             password, 
             location, 
             address, 
-            school, 
-            department, 
             gender, 
             telephone
         } = req.body;
 
     bcrypt.hash(password, saltRounds, (err, hash) => {
 
-        db.query('INSERT INTO interns (first_name,last_name,date_of_birth, age, professional_title, short_bio, skills, email_address,password,location,address,school,department,gender,telephone,is_Active, registration_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, age, professionalTitle, description, skills, emailAddress,hash,location, address, school, department,gender,parseInt(telephone),isActive, new Date()], (err, result) => {
+        db.query('INSERT INTO interns (first_name,last_name,date_of_birth, age, professional_title, short_bio, skills, email_address,password,location,address,gender,telephone,is_Active, registration_date) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ', [firstName, lastName,dateOfBirth, age, professionalTitle, description, skills, emailAddress,hash,location, address, gender,parseInt(telephone),isActive, new Date()], (err, result) => {
 
             if(err){
 
@@ -273,9 +271,7 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
         password, 
         location, 
         address, 
-        telephone, 
-        school, 
-        department,
+        telephone,
     } = req.body;
 
     const names = fullName.split(" ");
@@ -312,8 +308,6 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
                         hash, 
                         location, 
                         address,
-                        school,
-                        department,
                         parseInt(telephone),
                     ];
 
@@ -321,7 +315,7 @@ app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
                     data.push(profileImage);
                 }
             
-                db.query(`UPDATE interns SET first_name = ?, last_name = ?, date_of_birth = ?, age = ?, professional_title = ?, short_bio = ?, skills = ?, email_address = ?, password = ?, location = ?, address = ?, school = ?, department = ?, telephone = ?${profileImage ? ', profile_image = ?' : ''} WHERE intern_ID = ?`, [...data, internID], (err, result) => {
+                db.query(`UPDATE interns SET first_name = ?, last_name = ?, date_of_birth = ?, age = ?, professional_title = ?, short_bio = ?, skills = ?, email_address = ?, password = ?, location = ?, address = ?, telephone = ?${profileImage ? ', profile_image = ?' : ''} WHERE intern_ID = ?`, [...data, internID], (err, result) => {
         
                     if(err){
         
@@ -766,6 +760,80 @@ app.get("/intern/:id", (req,res) => {
     });
 });
 
+//Add intern education info
+app.post("/intern/:id/education", (req,res) => {
+    const internID = req.params.id;
+    const educationEntries = req.body;
+
+    educationEntries.forEach(education => {
+        const {
+            school_name,
+            department,
+            location,
+            degree,
+            start_date,
+            end_date
+        } = education;
+
+        const data = [
+            internID,
+            school_name,
+            department,
+            location,
+            degree,
+            start_date,
+            end_date
+        ];
+
+        db.query('INSERT INTO education_history (intern_ID, school_name, department, location, degree, start_date, end_date) VALUES (?,?,?,?,?,?,?) ', [...data], (err, result) => {
+            if(err){
+                console.log("Error inserting the education data into the database!", err);
+                return;
+            }
+            console.log("Education data inserted successfully!", result);
+        });
+    });
+
+    res.send({message: "Education data inserted successfully!"});
+});
+
+//Add intern experience info
+app.post("/intern/:id/work-history", (req,res) => {
+    const internID = req.params.id;
+    const workHistoryEntries = req.body;
+
+    workHistoryEntries.forEach(workHistory => {
+        const {
+            company_name,
+            location,
+            position,
+            description,
+            start_date,
+            end_date
+        } = workHistory;
+
+        const data = [
+            internID,
+            company_name,
+            location,
+            position,
+            description,
+            start_date,
+            end_date
+        ];
+
+        db.query('INSERT INTO work_history (intern_ID, company_name, location, position, short_description, start_date, end_date) VALUES (?,?,?,?,?,?,?) ', [...data], (err, result) => {
+            if(err){
+                console.log("Error inserting the work history data into the database!", err);
+                return;
+            }
+            console.log("Work History data inserted successfully!", result);
+        });
+    });
+
+    res.send({message: "Work History data inserted successfully!"});
+});
+
 //Get intern education info to update profile info
 app.get("/intern/:id/education", (req,res) => {
     const internID = req.params.id;
@@ -845,6 +913,34 @@ app.put("/update/intern/:internID/work_experience/:workExperienceID", (req,res) 
         }
         console.log("Work Experience data updated successfully!", result);
         res.send({message: "Work Experience data updated successfully!"});
+    });
+});
+
+//Delete intern education info
+app.delete("/delete/intern/:internID/education/:educationID", (req,res) => {
+    const internID = req.params.internID;
+    const educationID = req.params.educationID;
+    db.query('DELETE FROM education_history WHERE intern_ID = ? AND education_id = ?', [internID, educationID], (err, result) => {
+        if(err){
+            console.log("Error deleting the education data from the database!", err);
+            return;
+        }
+        console.log("Education data deleted successfully!", result);
+        res.send({message: "Education data deleted successfully!"});
+    });
+});
+
+//Delete intern experience info
+app.delete("/delete/intern/:internID/work_experience/:workExperienceID", (req,res) => {
+    const internID = req.params.internID;
+    const workExperienceID = req.params.workExperienceID;
+    db.query('DELETE FROM work_history WHERE intern_ID = ? AND work_id = ?', [internID, workExperienceID], (err, result) => {
+        if(err){
+            console.log("Error deleting the work history data from the database!", err);
+            return;
+        }
+        console.log("Work Experience data deleted successfully!", result);
+        res.send({message: "Work Experience data deleted successfully!"});
     });
 });
 

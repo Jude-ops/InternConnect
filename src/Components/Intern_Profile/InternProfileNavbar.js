@@ -30,6 +30,11 @@ function InternProfileNavbar(props) {
                 My Applications
             </a>
 
+            <a href={`/intern/${internID}/education_work_history`} className="list-group-item list-group-item-action">
+                <i className = "bi bi-duffle me-3"></i>
+                Education / Work History
+            </a>
+
             <a href={`/intern/${internID}/public_profile`} className="list-group-item list-group-item-action">
                 <i className = "bi bi-person-circle me-3"></i>
                 Public Profile

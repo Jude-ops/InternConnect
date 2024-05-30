@@ -23,8 +23,6 @@ function RegistrationIntern(props){
         confirmPassword: "",
         location: "",
         address: "",
-        school: "",
-        department: "",
         gender: "",
         telephone: ""
     });
@@ -65,7 +63,7 @@ function RegistrationIntern(props){
                 localStorage.setItem("internID", internID);
                 props.setInternID(internID);
 
-                navigate("/");
+                navigate(`/intern/${internID}/education_work_history`);
 
             };
 
@@ -238,7 +236,7 @@ function RegistrationIntern(props){
                                 </div>
                             </div>
 
-                            <div className = "row">
+                            {/*<div className = "row">
                                 <div className = "col-12 col-sm-6">
                                     <FormElement 
                                         labelFor = "school" 
@@ -264,7 +262,7 @@ function RegistrationIntern(props){
                                         value = {internInfo.department}
                                     />
                                 </div>
-                            </div>
+                            </div>*/}
 
                             <div className = "row">
                                 <div className = "col-12 col-sm-6">

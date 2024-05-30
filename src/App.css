@@ -293,7 +293,7 @@ table thead th{
 }
 
 .link-breadcrumb{
-    width: 160px !important;
+    width: 200px !important; /*160px*/
 }
 
 input:focus, select:focus, textarea:focus{
