@@ -682,7 +682,7 @@ app.get("/internship/:id", (req,res) => {
 
         }
 
-        console.log("Internship data selected successfully!", result);
+        console.log("Internship data selected successfully!");
         return res.json(result);
 
     });
@@ -693,9 +693,13 @@ app.put("/internship/:id", (req,res) => {
 
     const id = req.params.id;
     const {
+        internshipName,
+        internshipDescription,
+        location,
         internshipStartDate,
         internshipEndDate,
         internshipStatus,
+        category,
         applyBy,
         availablePositions,
         whoCanApply,
@@ -704,9 +708,13 @@ app.put("/internship/:id", (req,res) => {
     } = req.body;
 
     const data = [
+        internshipName,
+        internshipDescription,
+        location,
         internshipStartDate,
         internshipEndDate,
         internshipStatus,
+        category,
         applyBy,
         availablePositions,
         whoCanApply,
@@ -714,7 +722,7 @@ app.put("/internship/:id", (req,res) => {
         skillsRequired,
     ];
 
-    db.query('UPDATE internships SET start_date = ?, end_date = ?, internship_status = ?, apply_by = ?, available_positions = ?, who_can_apply = ?, perks = ?, skills_required = ? WHERE internship_ID = ?', [...data, id], (err, result) => {
+    db.query('UPDATE internships SET internship_name = ?, internship_description = ?, location_city = ?, start_date = ?, end_date = ?, internship_status = ?, category = ?, apply_by = ?, available_positions = ?, who_can_apply = ?, perks = ?, skills_required = ? WHERE internship_ID = ?', [...data, id], (err, result) => {
             
             if(err){
     
@@ -750,23 +758,27 @@ app.get("/company/:id/internships", (req,res) => {
 });
 
 app.get("/intern/:id/applications", (req,res) => {
-
     const id = req.params.id;
-
     db.query('SELECT * FROM applications WHERE intern_ID = ?', [id], (err, result) => {
-
         if(err){
-
             console.log("Error selecting the data from the database!", err);
             return;
-
         }
-
         console.log("Application data selected successfully!", result);
         return res.json(result);
-
     });
+});
 
+app.get("/company/:id/applications", (req,res) => {
+    const id = req.params.id;
+    db.query('SELECT * FROM applications WHERE company_ID = ?', [id], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Application data selected successfully!");
+        return res.json(result);
+    });
 });
 
 app.delete("/company/:id/internship/:internshipID/delete", (req,res) => {

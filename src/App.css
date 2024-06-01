@@ -118,22 +118,19 @@ textarea:focus{
     padding: 20px;
     border-radius: 20px;
     box-shadow:0px 0px 6px 0px rgba(0,0,0,0.5);
+    background-color: transparent !important;
 }
 
 .internship-key-details{
     width: 60%;
 }
 
-.internship-overview{
-    width: 30%;
-    padding: 30px;
-    border: 1px solid #EEEFF1;
-}
-
 .internship-title-box{
     padding: 18px;
     border: 1px solid #EEEFF1;
     height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 4px rgba(72,72,72,.12), 0 2px 2px rgba(72,72,72,.08);
 }
 
 .logo{
@@ -161,6 +158,18 @@ textarea:focus{
     line-height: 4;
 }
 
+@media screen and (max-width: 768px){
+    .posted-internships-table{
+        line-height: 1.5;
+    }
+}
+
+@media screen and (max-width: 768px){
+    #app-breadcrumb{
+        display: none;
+    }
+}
+
 .modal-header{
     background-color: #0B5ED7;
     color: white;
@@ -175,6 +184,7 @@ textarea:focus{
     box-shadow: 0 0 4px rgba(72,72,72,.12), 0 2px 2px rgba(72,72,72,.08);
     border-radius: 10px;
     padding: 20px;
+    background-color: transparent !important;
     border: none !important;
     cursor: pointer;
     position: relative !important;
@@ -185,6 +195,7 @@ textarea:focus{
     box-shadow: 0 0 10px rgba(72,72,72,.12), 0 4px 8px rgba(72,72,72,.08) !important;
     border: 1px solid #2980B9 !important;
     bottom: 5px !important;
+    background-color: white !important;
 }
 
 .internship-filters{
@@ -349,7 +360,7 @@ input:focus, select:focus, textarea:focus{
     color: white;
 }
 
-.public-profile-overview{
+.public-profile-overview, .internship-overview{
     padding: 30px;
     border: 1px solid #EEEFF1;
     border-radius: 10px;
@@ -369,7 +380,11 @@ input:focus, select:focus, textarea:focus{
     color: #2980B9;
 }
 
-.hire-me-section button, .public-profile-overview button{
+.internship-overview i, .internship-overview h3{
+    color: #2980B9;
+}
+
+.hire-me-section button, .public-profile-overview button, .internship-details button{
     padding: 13px 33px;
     background-color: #2980B9 !important;
     border: 1px solid #2980B9 !important;
@@ -392,7 +407,7 @@ input:focus, select:focus, textarea:focus{
     color: white !important;
 }
 
-.hire-me-section button:hover, .public-profile-overview button:hover{
+.hire-me-section button:hover, .public-profile-overview button:hover, .internship-details button:hover{
     background-color: #265c80 !important;
     border: 1px solid #265c80 !important;
     bottom: 5px;
@@ -407,6 +422,11 @@ input:focus, select:focus, textarea:focus{
 }
 
 #post-internship-button:hover{
+    background-color: #2980B9 !important;
+    color: white !important;
+}
+
+th{
     background-color: #2980B9 !important;
     color: white !important;
 }

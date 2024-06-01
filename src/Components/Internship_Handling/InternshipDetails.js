@@ -1,9 +1,10 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
 import FormElement from '../Form_Elements/FormElement';
+import SubHeader from '../Homepage/SubHeader';
 
 function InternshipDetails(props) {
 
@@ -113,15 +114,35 @@ function InternshipDetails(props) {
 
     }, [id]);
 
+    async function saveInternship(internshipID) {      
+        try {
+            const response = await axios.post(`http://localhost:5000/intern/${internID}/saved-internships`, {
+                internship_ID: internshipID
+            });
+            if (response) {
+                alert("Internship saved successfully!");
+            }
+        } catch (error) {
+            console.log('Error saving internship:', error);
+        } 
+    };
+
 
     return (
         <div>
             <Header isAuthenticated = {props.isAuthenticated}/>
+            <SubHeader 
+                title = {internshipDetails && internshipDetails[0].internship_name}
+                subtitle = {internshipDetails && internshipDetails[0].company_Name}
+            />
             {internshipDetails && (
 
                 <div className = "container my-5 internship-details">
 
-                    <h2 className = "text-center fw-bolder fs-1">{internshipDetails[0].company_Name}</h2>
+                    <Link to = {`/company/${internshipDetails[0].company_ID}/public_profile`} className = "nav-link">
+                        <h2 className = "text-center fw-bolder fs-1">{internshipDetails[0].company_Name}</h2>
+                    </Link>
+                    <hr className = "line-divider my-3"/>
 
                     <div className = "row">
                         <div className = "col-md-8">
@@ -131,7 +152,8 @@ function InternshipDetails(props) {
                                     <div className = "internship-title d-flex flex-column flex-grow-1">
                                         <h3 class = "h3 fw-bolder fs-2">{internshipDetails[0].internship_name}</h3>
                                         <div className = "d-flex justify-content-between align-items-center">
-                                            <p className = "small">
+                                            <p className = "small text-muted">
+                                                <i className = "bi bi-clock me-2"></i>
                                                 {
                                                     new Date(internshipDetails[0].posted_On).toLocaleDateString() === new Date().toLocaleDateString() ? "Posted Today" 
                                                     : 
@@ -139,26 +161,40 @@ function InternshipDetails(props) {
                                                         const datePosted = new Date(internshipDetails[0].posted_On);
                                                         const dateToday = new Date();
                                                         const daysSincePosted = Math.floor((dateToday - datePosted) / (1000 * 60 * 60 * 24));
-                                                        return `Posted ${daysSincePosted} days ago`;
-                                                    
+                                                        const weeksSincePosted = Math.floor(daysSincePosted / 7);
+                                                        const monthsSincePosted = Math.floor(daysSincePosted / 30);
+
+                                                        if (monthsSincePosted > 0) {
+                                                            return `Posted ${monthsSincePosted} month${monthsSincePosted > 1 ? 's' : ''} ago`;
+                                                        } else if (weeksSincePosted > 0) {
+                                                            return `Posted ${weeksSincePosted} week${weeksSincePosted > 1 ? 's' : ''} ago`;
+                                                        } else {
+                                                            return `Posted ${daysSincePosted} day${daysSincePosted > 1 ? 's' : ''} ago`;
+                                                        }
                                                     })()
                                                 }
                                             </p>
-                                            <p>{internshipDetails[0].location_city}</p>
-                                            <p className = "small"> Duration: {
-                                            (() => {
-                                                const start = new Date(internshipDetails[0].start_date);
-                                                const end = new Date(internshipDetails[0].end_date);
+                                            <p className = "small text-muted">
+                                                <i className = "bi bi-geo-alt me-2"></i>
+                                                {internshipDetails[0].location_city}
+                                            </p>
+                                            <p className = "small text-muted">
+                                                <i className = "bi bi-calendar-range me-2"></i>
+                                                {
+                                                    (() => {
+                                                        const start = new Date(internshipDetails[0].start_date);
+                                                        const end = new Date(internshipDetails[0].end_date);
 
-                                                const startYear = start.getFullYear();
-                                                const startMonth = start.getMonth();
+                                                        const startYear = start.getFullYear();
+                                                        const startMonth = start.getMonth();
 
-                                                const endYear = end.getFullYear();
-                                                const endMonth = end.getMonth();
+                                                        const endYear = end.getFullYear();
+                                                        const endMonth = end.getMonth();
 
-                                                return (endYear - startYear) * 12 + (endMonth - startMonth) + " months";
-                                            })()
-                                            }</p>
+                                                        return (endYear - startYear) * 12 + (endMonth - startMonth) + " months";
+                                                    })()
+                                                }
+                                            </p>
                                             
                                         </div>
                                     </div>
@@ -199,7 +235,7 @@ function InternshipDetails(props) {
                                 </div>
 
                                 <div className = "mt-4">
-                                    <h4 className = "h4 fw-bold fs-4 text-dark">Skills Required</h4>
+                                    <h4 className = "h4 fw-bold fs-4 text-dark mb-3">Skills Required</h4>
                                     {
                                         (() => {
                                             const skills = internshipDetails[0].skills_required.split(/[\n,]+/);
@@ -208,14 +244,14 @@ function InternshipDetails(props) {
                                             });
 
                                             return trimmedSkills.map((skill,index) => {
-                                                return <div key = {index} className = "badge rounded-pill bg-primary me-2 skill-required">{skill}</div>
+                                                return <span key = {index} className = "profile-skill">{skill}</span>
                                             })
                                         })()
                                     }
                                 </div>
 
                                 <div className = "mt-4">
-                                    <h4 className = "h4 fw-bold fs-4 text-dark">Perks of the internship</h4>
+                                    <h4 className = "h4 fw-bold fs-4 text-dark mb-3">Perks of the internship</h4>
                                     {
                                         (() => {
                                             const perks = internshipDetails[0].perks.split(/[\n,]+/);
@@ -224,7 +260,7 @@ function InternshipDetails(props) {
                                             });
 
                                             return trimmedPerks.map((perk,index) => {
-                                                return <div key = {index} className = "badge rounded-pill bg-primary me-2 perks-internship">{perk}</div>
+                                                return <span key = {index} className = "profile-skill">{perk}</span>
                                             })
                                         })()
                                     }
@@ -232,11 +268,23 @@ function InternshipDetails(props) {
                     
                             </div>
 
+                            <div className = "mt-5">
+                                <Link to = {`/company/${internshipDetails[0].company_ID}/internship/${internshipDetails[0].internship_ID}/edit`}>
+                                    <button type = "button" className = "btn btn-primary">
+                                        Edit Internship
+                                    </button>
+                                </Link>
+                            </div>
+
                             {userType === "intern" && 
 
                                 <div className = "mt-5">
                                     <button onClick = {getInternDetails} type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                    Apply Now
+                                        Apply Now
+                                    </button>
+
+                                    <button onClick = {() => {saveInternship(internshipDetails[0].internship_ID)}} type="button" class="btn btn-primary btn-lg ms-3">
+                                        Save Internship
                                     </button>
 
                                     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -326,37 +374,84 @@ function InternshipDetails(props) {
                         </div>
                     
                         <div className = "col-md-4">
-                            <div className = "internship-overview w-100">
+                            <div className = "internship-overview w-100 mt-4 mt-md-0">
                                 <h3 className = "h3 fw-bolder fs-2">Internship Overview</h3>
+                                <hr className = "line-divider my-3"/>
 
-                                <div className = "d-flex flex-column mt-5">
+                                <div className = "d-flex flex-column mt-4">
 
                                     <div className = "d-flex mb-3">
-                                        <div className = "icon"></div>
-                                        <div className = "p-1 ms-3">Category: 
-                                            <p className = "small">{internshipDetails[0].category}</p>
+                                        <span>
+                                            <i className = "bi bi-briefcase h4"></i>
+                                        </span>
+                                        <div className = "ms-3">
+                                            <span className = "text-muted">Category:</span> 
+                                            <p className = "small fw-bold">{internshipDetails[0].category}</p>
                                         </div>
                                     </div>
 
                                     <div className = "d-flex mb-3">
-                                        <div className = "icon"></div>
-                                        <div className = "p-1 ms-3">Start Date: 
-                                            <p className = "small">{new Date(internshipDetails[0].start_date).toDateString()}</p>
+                                        <span>
+                                            <i className = "bi bi-clock h4"></i>
+                                        </span>
+                                        <div className = "ms-3">
+                                            <span className = "text-muted">Start Date:</span> 
+                                            <p className = "small fw-bold">
+                                                {
+                                                    (() => {
+                                                        //Get the month, day and year from the date
+                                                        const date = new Date(internshipDetails[0].start_date);
+                                                        const month = date.toLocaleString('default', { month: 'short' });
+                                                        const day = date.getDate();
+                                                        const year = date.getFullYear();
+                                                        return ` ${month} ${day}, ${year}`;
+                                                    })()
+                                                }
+                                            </p>
                                         </div>
-                                        <div className = "p-1 ms-3">End Date:
-                                            <p className = "small">{new Date(internshipDetails[0].end_date).toDateString()}</p>
+                                        <div className = "ms-3">
+                                            <span className = "text-muted">End Date:</span>
+                                            <p className = "small fw-bold">
+                                                {
+                                                    (() => {
+                                                        //Get the month, day and year from the date
+                                                        const date = new Date(internshipDetails[0].end_date);
+                                                        const month = date.toLocaleString('default', { month: 'short' });
+                                                        const day = date.getDate();
+                                                        const year = date.getFullYear();
+                                                        return ` ${month} ${day}, ${year}`;
+                                                    })()
+                                                }
+                                            </p>
                                         </div>
                                     </div>
                                     <div className = "d-flex mb-3">
-                                        <div className = "icon"></div>
-                                        <div className = "p-1 ms-3">Apply By: 
-                                            <p className = "small">{new Date(internshipDetails[0].apply_by).toDateString()}</p>
+                                        <span>
+                                            <i className = "bi bi-cash h4"></i>
+                                        </span>
+                                        <div className = "ms-3">
+                                            <span className = "text-muted">Apply By:</span> 
+                                            <p className = "small fw-bold">
+                                                {
+                                                    (() => {
+                                                        //Get the month, day and year from the date
+                                                        const date = new Date(internshipDetails[0].apply_by);
+                                                        const month = date.toLocaleString('default', { month: 'short' });
+                                                        const day = date.getDate();
+                                                        const year = date.getFullYear();
+                                                        return ` ${month} ${day}, ${year}`;
+                                                    })()
+                                                }
+                                            </p>
                                         </div>
                                     </div>
                                     <div className = "d-flex">
-                                        <div className = "icon"></div>
-                                        <div className = "p-1 ms-3">No. of available positions:
-                                            <p className = "small">{internshipDetails[0].available_positions}</p>
+                                        <span>
+                                            <i className = "bi bi-person h4"></i>
+                                        </span>
+                                        <div className = "ms-3">
+                                            <span className = "text-muted">No. of available positions:</span>
+                                            <p className = "small fw-bold">{internshipDetails[0].available_positions}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
+import SubHeader from '../Homepage/SubHeader';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import FormElement from '../Form_Elements/FormElement';
@@ -10,18 +11,19 @@ function EditInternship(props) {
   const {companyID, id} = useParams();
   const navigate = useNavigate();
 
-  const [internshipInfo, setInternshipInfo] = useState(null);
   const [internshipData, setInternshipData] = useState({
-
+    internshipName: "",
+    internshipDescription: "",
+    location: "",
     internshipStartDate: "",
     internshipEndDate: "",
     internshipStatus: "",
+    category: "",
     applyBy: "",
     availablePositions: "",
     whoCanApply: "",
     perksOfInternship: "",
     skillsRequired: "",
-
   });
 
   function handleChange(name, value) {
@@ -38,7 +40,33 @@ function EditInternship(props) {
       try {
         const response = await axios.get(`http://localhost:5000/internship/${id}`);
         console.log(response.data);
-        setInternshipInfo(response.data);
+
+        //Function to convert all retrieved dates to string
+        function convertDate(date){
+          const newDate = new Date(date);
+          const offset = newDate.getTimezoneOffset();
+          newDate.setMinutes(newDate.getMinutes() - offset);
+          return newDate.toISOString().split('T')[0];
+        }
+
+
+        setInternshipData(prevValue => {
+          return {
+            ...prevValue,
+            internshipName: response.data[0].internship_name,
+            internshipDescription: response.data[0].internship_description,
+            location: response.data[0].location_city,
+            internshipStartDate: convertDate(response.data[0].start_date),
+            internshipEndDate: convertDate(response.data[0].end_date),
+            internshipStatus: response.data[0].internship_status,
+            category: response.data[0].category,
+            applyBy: convertDate(response.data[0].apply_by),
+            availablePositions: response.data[0].available_positions,
+            whoCanApply: response.data[0].who_can_apply,
+            perksOfInternship: response.data[0].perks,
+            skillsRequired: response.data[0].skills_required,
+          }
+        });
       } catch (error) {
         console.error("Error fetching internship data: ", error);
       }
@@ -48,37 +76,85 @@ function EditInternship(props) {
   }, [id]);
 
   async function postUpdatedInternship(event) {
-
     event.preventDefault();
-
     try {
-
-      const response = await axios.put(`http://localhost:5000/internship/${id}`, internshipData);
-
+      const response = await axios.put(`http://localhost:5000/internship/${id}`, internshipData);      
       if (response) {
         console.log("Internship updated successfully");
         navigate(`/company/${companyID}/internships`);
-
       }
-
     } catch (error) {
       console.log('Error updating internship:', error);
     }
-
   };
 
   return (
     <div>
       <Header isAuthenticated = {props.isAuthenticated}/>
+      <SubHeader
+        title = {internshipData && internshipData.internshipName}
+        subtitle = "Make changes to your internship listing"
+      />
 
-      {internshipInfo && (
+      {internshipData && (
         <div className = "container my-5">
-          <h2 className = "heading text-center fw-bold mb-5">Edit Internship</h2>
-          <h3 className = "text-center fw-bold text-uppercase">{internshipInfo[0].internship_name}</h3>
-          <p className = "text-center fs-5 fst-italic text-muted">Make changes to your internship listing</p>
-          <div className = "row mt-2">
-            <div className = "col-md-6 offset-md-3">
+          <p className = "text-center h3 fw-bold">Edit Internship Portal</p>
+          <div className = "row mt-4">
+            <div className = "col-12 col-md-8 mx-auto">
               <form className = "registration-form">
+
+                <FormElement
+                  labelFor = "internshipName"
+                  type = "text"
+                  placeholder = "e.g. Web Development Internship"
+                  id = "internshipName"
+                  name = "internshipName"
+                  labelTitle = "Internship Name"
+                  onChange = {handleChange}
+                  value = {internshipData.internshipName}
+                />
+
+                <div className = "row mb-3">
+                    <div className = "col-12 col-sm-6">
+                        <FormElement 
+                            labelFor = "category" 
+                            type = "text" 
+                            placeholder = "e.g. Web Development"
+                            id = "category"
+                            name = "category"
+                            labelTitle = "Category"
+                            onChange = {handleChange}
+                            value = {internshipData.category}
+                        />
+                    </div>
+
+                    <div className = "col-12 col-sm-6">
+                        <FormElement 
+                            labelFor = "location" 
+                            type = "text" 
+                            placeholder = "e.g. New York"
+                            id = "location"
+                            name = "location"
+                            labelTitle = "Location"
+                            onChange = {handleChange}
+                            value = {internshipData.location}
+                        />
+                    </div>
+                </div>
+
+                <div className="my-3">
+                    <label for="internshipDescription" class="form-label fw-bold">Description</label>
+                    <textarea 
+                        className="form-control" 
+                        id="internshipDescription" 
+                        rows="6" 
+                        value = {`${internshipData.internshipDescription}`}
+                        name = "internshipDescription"
+                        onChange={(event) => {
+                            handleChange(event.target.name, event.target.value)
+                        }}
+                    ></textarea>
+                </div>
 
                 <div className = "row mb-3">
                     <div className = "col-12 col-sm-6">
@@ -136,8 +212,8 @@ function EditInternship(props) {
                     </div>
                 </div>
 
-                <div className="my-4">
-                    <label for="whoCanApply" class="form-label">Who Can Apply</label>
+                <div className="my-3">
+                    <label for="whoCanApply" class="form-label fw-bold">Who Can Apply</label>
                     <textarea 
                         className="form-control" 
                         id="whoCanApply" 
@@ -151,7 +227,7 @@ function EditInternship(props) {
                 </div>
 
                 <div className="my-4">
-                        <label for="skillsRequired" class="form-label">Skill(s) Required</label>
+                        <label for="skillsRequired" class="form-label fw-bold">Skill(s) Required</label>
                         <textarea
                             className="form-control" 
                             id="skillsRequired" 
@@ -172,7 +248,7 @@ function EditInternship(props) {
                         name = "perksOfInternship"
                         labelTitle = "Perks of Internship"
                         onChange = {handleChange}
-                        value = {internshipInfo.perksOfInternship}
+                        value = {internshipData.perksOfInternship}
                 />
                 
                 <div>

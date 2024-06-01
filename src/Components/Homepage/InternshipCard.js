@@ -96,14 +96,6 @@ function InternshipCard(props){
 
                         <Slider {...settings}>
                             {internshipData.map((internship) => {
-
-                                //Get days since posted
-                                const datePosted = new Date(internship.posted_On);
-                                const dateToday = new Date();
-
-                                //Calculate difference in milliseconds and convert to days
-                                const daysSincePosted = Math.floor((dateToday - datePosted) / (1000 * 60 * 60 * 24));
-
         
                                 //Get duration of internship
                                 function calculateMonthDifference(startDate, endDate){
@@ -148,7 +140,25 @@ function InternshipCard(props){
                                             </p>
                                             <p className="card-text">
                                                 <i className="bi bi-clock me-2"></i>
-                                                Posted {daysSincePosted} days ago
+                                                {
+                                                    new Date(internship.posted_On).toLocaleDateString() === new Date().toLocaleDateString() ? "Posted Today" 
+                                                    : 
+                                                    (()=> {
+                                                        const datePosted = new Date(internship.posted_On);
+                                                        const dateToday = new Date();
+                                                        const daysSincePosted = Math.floor((dateToday - datePosted) / (1000 * 60 * 60 * 24));
+                                                        const weeksSincePosted = Math.floor(daysSincePosted / 7);
+                                                        const monthsSincePosted = Math.floor(daysSincePosted / 30);
+
+                                                        if (monthsSincePosted > 0) {
+                                                            return `Posted ${monthsSincePosted} month${monthsSincePosted > 1 ? 's' : ''} ago`;
+                                                        } else if (weeksSincePosted > 0) {
+                                                            return `Posted ${weeksSincePosted} week${weeksSincePosted > 1 ? 's' : ''} ago`;
+                                                        } else {
+                                                            return `Posted ${daysSincePosted} day${daysSincePosted > 1 ? 's' : ''} ago`;
+                                                        }
+                                                    })()
+                                                }
                                             </p>
                                             <p className="card-text">
                                                 <i className="bi bi-calendar-range me-2"></i>

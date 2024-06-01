@@ -401,8 +401,16 @@ function InternshipsListing(props) {
                                                     const datePosted = new Date(internship.posted_On);
                                                     const dateToday = new Date();
                                                     const daysSincePosted = Math.floor((dateToday - datePosted) / (1000 * 60 * 60 * 24));
-                                                    return `Posted ${daysSincePosted} days ago`;
-                                                
+                                                    const weeksSincePosted = Math.floor(daysSincePosted / 7);
+                                                    const monthsSincePosted = Math.floor(daysSincePosted / 30);
+
+                                                    if (monthsSincePosted > 0) {
+                                                        return `Posted ${monthsSincePosted} month${monthsSincePosted > 1 ? 's' : ''} ago`;
+                                                    } else if (weeksSincePosted > 0) {
+                                                        return `Posted ${weeksSincePosted} week${weeksSincePosted > 1 ? 's' : ''} ago`;
+                                                    } else {
+                                                        return `Posted ${daysSincePosted} day${daysSincePosted > 1 ? 's' : ''} ago`;
+                                                    }
                                                 })()
                                             }
                                         </small>
@@ -411,7 +419,17 @@ function InternshipsListing(props) {
                                     <span className="card-text">
                                         <small className = "text-muted">
                                             <i className="bi bi-calendar2-check-fill me-2"></i>
-                                            Start Date: {new Date(internship.start_date).toDateString()}
+                                            Start Date: 
+                                            {
+                                                (() => {
+                                                    //Get the month, day and year from the date
+                                                    const date = new Date(internship.start_date);
+                                                    const month = date.toLocaleString('default', { month: 'short' });
+                                                    const day = date.getDate();
+                                                    const year = date.getFullYear();
+                                                    return ` ${month} ${day}, ${year}`;
+                                                })()
+                                            }
                                         </small>
                                     </span>
                                 </div>
@@ -420,7 +438,6 @@ function InternshipsListing(props) {
                                     <div><i className = "bi bi-heart h3 me-4 save-internship-icon" onClick={() =>{saveInternship(internship.internship_ID)}}></i></div>
                                     <Link to = {`/internship/${internship.internship_ID}`}><button className="btn btn-primary btn-sm">View Details</button></Link>
                                 </div>
-
                                 
                             </div>
                         </div>

@@ -119,7 +119,7 @@ function UpdateCompanyInfo(props){
             });
 
             if(response){
-                navigate(`/update/company/${id}`);
+                window.location.reload();
             }
         } catch (error) {
             console.error("Error updating company info:", error);

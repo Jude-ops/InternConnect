@@ -17,6 +17,7 @@ import MyApplications from "./Components/Intern_Profile/MyApplications";
 import SavedInternships from "./Components/Intern_Profile/SavedInternships";
 import PublicProfile from "./Components/Intern_Profile/PublicProfile";
 import EducationWorkHistory from "./Components/Intern_Profile/EducationWorkHistory";
+import CompanyPublicProfile from "./Components/Company_Profile/CompanyPublicProfile";
 
  function App() {
 
@@ -91,6 +92,7 @@ const logout = () => {
           <Route path = "/intern/:id/saved_internships" element = {<SavedInternships isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/intern/:id/public_profile" element = {<PublicProfile isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/intern/:id/education_work_history" element = {<EducationWorkHistory isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/company/:id/public_profile" element = {<CompanyPublicProfile isAuthenticated = {user} logout = {logout} />} />
         </Routes>
       </BrowserRouter>
     </div>
