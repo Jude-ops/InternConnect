@@ -5,7 +5,6 @@ import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import SubHeader from "./SubHeader";
-import companyLogo from "../../company-logo1.png";
 
 function InternshipCard(props){
 
@@ -126,7 +125,10 @@ function InternshipCard(props){
                                         <div className="card-body d-flex flex-column">
                                             <div className = "d-flex mb-3">
                                                 <div className = "logo me-3">
-                                                    <img src={companyLogo} alt="Company Logo" />
+                                                    <img 
+                                                        src={`http://localhost:5000/uploads/${internship.profile_image}`} 
+                                                        alt="Company Logo"     
+                                                    />
                                                 </div>
                                                 <div className = "d-flex flex-column">
                                                     <h4 className = "card-title">{internship.internship_name}</h4>

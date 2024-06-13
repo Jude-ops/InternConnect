@@ -125,6 +125,20 @@ function InternshipsListing(props) {
     }
 
     async function saveInternship(internshipID){
+
+        const token = localStorage.getItem("token");
+        const userType = localStorage.getItem("userType");
+
+        if(!token){
+            alert("You need to be logged in to save internships");
+            return;
+        }
+
+        if(userType !== "intern"){
+            alert("Only interns can save internships");
+            return;
+        }
+
         try{
             const response = await axios.post(`http://localhost:5000/intern/${internID}/saved-internships`, {
                 internship_ID: internshipID,
@@ -357,7 +371,12 @@ function InternshipsListing(props) {
                         <div className = "card internship-listing mb-4">
                             <div className="card-body d-flex flex-column">
                                 <div className = "d-flex mb-3">
-                                    <div className = "me-3 logo"></div>
+                                    <div className = "me-3 logo">
+                                        <img 
+                                            src = {`http://localhost:5000/uploads/${internship.profile_image}`} 
+                                            alt = "Company Logo" 
+                                        />
+                                    </div>
                                     <div className = "d-flex flex-column">
                                         <h3 className="card-title fw-bold">{internship.internship_name}</h3>
                                         <p className="card-subtitle mb-2 text-muted">{internship.company_Name}</p>

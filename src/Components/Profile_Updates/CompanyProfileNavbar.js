@@ -22,6 +22,12 @@ function CompanyProfileNavbar(props) {
                 Manage Internships
             </a>
 
+            <a href={`/company/${companyID}/received_applications`} className="list-group-item list-group-item-action">
+                <i className = "bi bi-journal-text me-3"></i>
+                Received Applications
+            </a>
+
+
             <a href={`/company/${companyID}/saved_interns`} className="list-group-item list-group-item-action">
                 <i className = "bi bi-heart me-3"></i>
                 Shortlisted Interns

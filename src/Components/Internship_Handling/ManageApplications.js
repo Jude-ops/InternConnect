@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
+import SubHeader from '../Homepage/SubHeader';
+import CompanyProfileNavbar from '../Profile_Updates/CompanyProfileNavbar';
 import { useParams} from 'react-router-dom';
 import axios from 'axios';
 
@@ -14,6 +16,7 @@ function ManageApplications(props) {
       async function fetchApplications() {
         try {
           const response = await axios.get(`http://localhost:5000/company/${id}/applications`);
+          console.log("Applications: ", response.data)
           setApplications(response.data);
         } catch (error) {
           console.error("Error fetching company applications: ", error);
@@ -24,81 +27,105 @@ function ManageApplications(props) {
 
     }, [id])
 
+  async function shortlistIntern(internID) {
+    try {
+      const response = await axios.post(`http://localhost:5000/company/${id}/shortlist`, {
+        internID: internID
+      });
+      if(response) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error shortlisting intern: ", error);
+    }
+  }
 
   return (
     <div>
       <Header isAuthenticated = {props.isAuthenticated}/>
+      <SubHeader
+        title = "Manage Applications"
+        subtitle = "Manage applications for your posted internships"
+      />
 
       <div className = "container my-5">
+        <div className = "row">
+          <div className = "col-12 col-lg-4">
+            <CompanyProfileNavbar logout = {props.logout} />
+          </div>
 
-        <h2 className = "heading text-center fw-bold">Manage Applications</h2>
+          <div className = "col-12 col-lg-8">
+            <div className = "mt-4 mt-lg-0">
+              <div className = "row">
+                <div className = "col-12">
+                  <h4 className = "h4 fw-bold">
+                    You've received {applications && applications.length} application{applications && (applications.length > 1 || applications.length === 0 ? ('s') : (''))}
+                  </h4>
+                </div>
+              </div>
 
-        <div className = "row mt-5">
-            <div className = "col-12">
-                <h3 className = "h3 fw-bold">
-                    You've received 3 applications
-                </h3>
-            </div>
-        </div>
-
-        <div className = "row mt-2">
-            <div className = "col-md-12 table-responsive posted-internships-table">
-                <table className = "table table-hover align-middle text-center">
+              <div className = "row mt-2">
+                <div className = "col-md-12 table-responsive posted-internships-table">
+                  <table className = "table table-hover align-middle text-center">
                     <thead>
-                        <tr>
-                            <th scope = "col" className = "text-uppercase">Candidate</th>
-                            <th scope = "col" className = "text-uppercase">Applied Internship</th>
-                            <th scope = "col" className = "text-uppercase">Applied Date</th>
-                            <th scope = "col" className = "text-uppercase">Action</th>
-                            <th scope = "col" className = "text-uppercase">CV</th>
-                            <th scope = "col" className = "text-uppercase">Status</th>
-                        </tr>
+                      <tr>
+                        <th scope = "col" className = "text-uppercase small">Candidate</th>
+                        <th scope = "col" className = "text-uppercase small">Applied Internship</th>
+                        <th scope = "col" className = "text-uppercase small">Applied Date</th>
+                        <th scope = "col" className = "text-uppercase small">Action</th>
+                        <th scope = "col" className = "text-uppercase small">CV</th>
+                        <th scope = "col" className = "text-uppercase small">Cover Letter</th>
+                      </tr>
                     </thead>
 
                     <tbody>
-                        <tr>
-                            <td>John Doe</td>
-                            <td>Software Developer Intern</td>
-                            <td>12-08-2021</td>
-                            <td>
-                              <button className = "btn btn-primary">View</button>
-                              <button className = "btn btn-success ms-2">Accept</button>
-                              <button className = "btn btn-danger ms-2">Reject</button>
+                      {applications && applications.map((application) => {
+                        return (
+                          <tr key = {application.application_ID}>
+                            <td className = "small">{application.full_name}</td>
+                            <td className = "small">{application.internship_name}</td>
+                            <td className = "small">
+                              {new Date(application.date_applied).toLocaleDateString()}
                             </td>
-                            <td><a href = "#" className = "text-decoration-none">Download</a></td>
-                            <td>Shortlisted</td>
-                        </tr>
+                            <td className = "small">
+                              <a href = {`/intern/${application.intern_ID}/public_profile`}><i className = "bi bi-eye ms-2" style = {{color:"green"}}></i></a>
+                              <i 
+                                role = "button" 
+                                onClick = {() => shortlistIntern(application.intern_ID)} 
+                                className = "bi bi-heart ms-2" 
+                                style = {{color:"#2980B9"}}>
+                              </i>
+                            </td>
+                            <td className = "small">
+                              <a href = {`http://localhost:5000/document/${application.intern_ID}`} className = "btn" role = "button" style = {{color:"#2980B9", textDecoration:"underline"}}>Download</a>
+                            </td>
+                            <td className = "small">
+                              <span role = "button" data-bs-toggle="modal" data-bs-target="#exampleModal" style = {{color:"green"}}>View</span>
 
-                        <tr>
-                            <td>Jane Doe</td>
-                            <td>Marketing Intern</td>
-                            <td>12-08-2021</td>
-                            <td>
-                              <button className = "btn btn-primary">View</button>
-                              <button className = "btn btn-success ms-2">Accept</button>
-                              <button className = "btn btn-danger ms-2">Reject</button>
+                              <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header text-center" style = {{backgroundColor: "#2980B9"}}>
+                                              <h1 class="modal-title w-100 fs-5" id="exampleModalLabel">Cover Letter</h1>
+                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                            <p style = {{lineHeight: "2"}}>{application.cover_letter}</p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
                             </td>
-                            <td><a href = "#" className = "text-decoration-none">Download</a></td>
-                            <td className = "text-danger">Rejected</td>
-                        </tr>
-
-                        <tr>
-                            <td>John Smith</td>
-                            <td>Software Developer Intern</td>
-                            <td>12-08-2021</td>
-                            <td>
-                              <button className = "btn btn-primary">View</button>
-                              <button className = "btn btn-success ms-2">Accept</button>
-                              <button className = "btn btn-danger ms-2">Reject</button>
-                            </td>
-                            <td><a href = "#" className = "text-decoration-none">Download</a></td>
-                            <td className = "text-success">Accepted</td>
-                        </tr>
+                          </tr>
+                        )
+                      })}
                     </tbody>
-                </table>
+                  </table>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-
       </div>
 
       <Footer />

@@ -27,6 +27,16 @@ function SavedInternships(props) {
     
     }, [id]);
 
+    async function removeSavedInternship(internshipID){
+        try {
+            const response = await axios.delete(`http://localhost:5000/intern/${id}/saved-internship/${internshipID}`);
+            console.log(response.data);
+            setSavedInternships(savedInternships.filter(internship => internship.internship_ID !== internshipID));
+        } catch (error) {
+            console.log('Error removing saved internship:', error);
+        }
+    }
+
   return (
     <div>
         <Header isAuthenticated = {props.isAuthenticated} />
@@ -118,9 +128,7 @@ function SavedInternships(props) {
                                             </div>
 
                                             <div className = "d-flex justify-content-between align-items-center">
-                                                <a href = "/" className = "nav-link">
-                                                    <i class="bi bi-trash3 h3 remove-saved-internship"></i>
-                                                </a>
+                                                <span><i class="bi bi-trash3 h3 remove-saved-internship" onClick = {() => {removeSavedInternship(internship.internship_ID)}}></i></span>
                                                 <Link to = {`/internship/${internship.internship_ID}`}><button className = "btn btn-primary">View Details</button></Link>
                                             </div>  
                                         </div>

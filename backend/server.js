@@ -650,45 +650,34 @@ app.post("/internships", (req,res) => {
     });
 });
 
-
+//Get all internships
 app.get("/internships", (req,res) => {
-
-    db.query('SELECT * FROM internships', (err, result) => {
-
+    //Join the internships table with the companies table to get the company profile image
+    db.query('SELECT internships.*, companies.profile_image FROM internships INNER JOIN companies ON internships.company_ID = companies.company_ID', (err, result) => {
         if(err){
-
-            console.log("Error selecting the data from the database!", err);
+            console.log("Error selecting all the internships from the database!", err);
             return;
-
         }
-
-        console.log("Internship data selected successfully!");
+        console.log("All Internships selected successfully!");
         return res.json(result);
-
     });
-
 });
 
+//Get details of a specific internship
 app.get("/internship/:id", (req,res) => {
-
     const id = req.params.id;
-
-    db.query('SELECT * FROM internships WHERE internship_ID = ?', [id], (err, result) => {
-
+    //Join the internships table with the companies table to get the company profile image
+    db.query('SELECT internships.*, companies.profile_image FROM internships INNER JOIN companies ON internships.company_ID = companies.company_ID WHERE internship_ID = ?', [id], (err, result) => {           
         if(err){
-
             console.log("Error selecting the data from the database!", err);
             return;
-
         }
-
         console.log("Internship data selected successfully!");
-        return res.json(result);
-
+        return res.json(result);  
     });
-
 });
 
+//Update internship information
 app.put("/internship/:id", (req,res) => {
 
     const id = req.params.id;
@@ -757,6 +746,7 @@ app.get("/company/:id/internships", (req,res) => {
 
 });
 
+//Get applications for a specific intern
 app.get("/intern/:id/applications", (req,res) => {
     const id = req.params.id;
     db.query('SELECT * FROM applications WHERE intern_ID = ?', [id], (err, result) => {
@@ -769,9 +759,25 @@ app.get("/intern/:id/applications", (req,res) => {
     });
 });
 
+//Join applications table with internships table to get internship name only
 app.get("/company/:id/applications", (req,res) => {
     const id = req.params.id;
-    db.query('SELECT * FROM applications WHERE company_ID = ?', [id], (err, result) => {
+    db.query('SELECT applications.*, internships.internship_name FROM applications INNER JOIN internships ON applications.internship_ID = internships.internship_ID WHERE applications.company_ID = ?', [id], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Application data selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Get applications for a specific internship
+app.get("/internship/:internshipID/applications", (req,res) => {
+    const id = req.params.internshipID;
+
+    //Join the applications table with the interns and internships table to get the intern name, profile image, and internship name
+    db.query('SELECT applications.*, interns.profile_image, interns.professional_title, internships.internship_name FROM applications INNER JOIN interns ON applications.intern_ID = interns.intern_ID INNER JOIN internships ON applications.internship_ID = internships.internship_ID WHERE applications.internship_ID = ?', [id], (err, result) => {
         if(err){
             console.log("Error selecting the data from the database!", err);
             return;
@@ -782,23 +788,15 @@ app.get("/company/:id/applications", (req,res) => {
 });
 
 app.delete("/company/:id/internship/:internshipID/delete", (req,res) => {
-
     const internshipID = req.params.internshipID;
-
     db.query('DELETE FROM internships WHERE internship_ID = ?', [internshipID], (err, result) => {
-
         if(err){
-
             console.log("Error deleting the data from the database!", err);
             return;
-
         }
-
         console.log("Internship data deleted successfully!", result);
         res.send({message: "Internship data deleted successfully!"});
-
     });
-
 });
 
 //Get intern info to update profile info
@@ -1000,24 +998,17 @@ app.delete("/delete/intern/:internID/work_experience/:workExperienceID", (req,re
 
 //Get intern info to apply for internship
 app.get("/intern/info/:internID", (req,res) => {
-
     const internID = req.params.internID;
     console.log(internID);
-
     db.query('SELECT * FROM interns WHERE intern_ID = ?', [internID], (err, result) => {
-
         if(err){
 
             console.log("Error selecting the data from the database!", err);
             return;
-
         }
-
         console.log("Intern data selected successfully!");
         return res.json(result);
-
-    });
-    
+    });    
 });
 
 //Route for applying to an internship
@@ -1054,18 +1045,13 @@ app.post('/internship/:id/apply', upload.single('resume'), (req, res) => {
         new Date() // Date of application
     ];
 
-    db.query('INSERT INTO applications (intern_ID, company_ID, internship_ID, full_name, email, phone, cover_letter, resume, application_status, date_applied) VALUES (?,?,?,?,?,?,?,?,?,?) ', [...data], (err, result) => {
-        
+    db.query('INSERT INTO applications (intern_ID, company_ID, internship_ID, full_name, email, phone, cover_letter, resume, application_status, date_applied) VALUES (?,?,?,?,?,?,?,?,?,?) ', [...data], (err, result) => {     
         if(err){
-
             console.log("Error inserting the data into the database!", err);
             return;
-
         }
-
         console.log("Application data inserted successfully!", result);
         res.send({message: "Application data inserted successfully!"});
-
     });
    
     const sql = 'INSERT INTO documents (document_name, document_type, document_size, document_path, intern_ID) VALUES (?, ?, ?, ?, ?)';
@@ -1091,55 +1077,104 @@ app.get('/document/:internID', (req, res) => {
     });
 });
 
+//Route to save an internship
 app.post("/intern/:id/saved-internships", (req,res) => {
-    
     const internID = req.params.id;
     const {internship_ID} = req.body;
-
     db.query('INSERT INTO saved_internships (internship_ID, intern_ID) VALUES (?,?) ', [internship_ID, internID], (err, result) => {
-
         if(err){
-
             console.log("Error inserting the data into the database!", err);
             return;
-
         }
-
         console.log("Saved internship data inserted successfully!", result);
         res.send({message: "Saved internship data inserted successfully!"});
-
-    });
-    
+    });   
 });
 
+//Route to get saved internships
 app.get("/intern/:id/saved-internships", (req,res) => {
-
     const internID = req.params.id;
 
     //Join internships and saved_internships tables to get the saved internships
-
     const query = `
         SELECT internships.* FROM saved_internships
         INNER JOIN internships ON saved_internships.internship_ID = internships.internship_ID
         WHERE saved_internships.intern_ID = ?
     `;
-
     db.query(query, [internID], (err, result) => {
-
         if(err){
-
             console.log("Error selecting the data from the database!", err);
             return;
-
         }
-
         console.log("Saved internships data selected successfully!", result);
         return res.json(result);
-
     });
-
 });
 
+//Route to delete a saved internship
+app.delete("/intern/:id/saved-internship/:internshipID", (req,res) => {
+    const internID = req.params.id;
+    const internshipID = req.params.internshipID;
+    db.query('DELETE FROM saved_internships WHERE intern_ID = ? AND internship_ID = ?', [internID, internshipID], (err, result) => {
+        if(err){
+            console.log("Error deleting the saved internship from the database!", err);
+            return;
+        }
+        console.log("Saved internship data deleted successfully!", result);
+        res.send({message: "Saved internship data deleted successfully!"});
+    });
+});
+
+//Route to shortlist an intern
+app.post("/company/:id/shortlist", (req,res) => {
+    const companyID = req.params.id;
+    const {internID} = req.body;
+    db.query('INSERT INTO shortlisted_interns (company_ID, intern_ID) VALUES (?,?) ', [companyID, internID], (err, result) => {
+        if(err){
+            console.log("Error inserting the data into the database!", err);
+            return;
+        }
+        console.log("Shortlisted intern data inserted successfully!");
+        res.send({message: "Shortlisted intern data inserted successfully!"});
+    }); 
+});
+
+//Route to get shortlisted interns
+app.get("/company/:companyID/shortlist", (req,res) => {
+    const companyID = req.params.companyID;
+
+    //Join shortlisted_interns, interns, and companies tables  to get the shortlisted interns and company name
+    const query = `
+        SELECT interns.*, companies.company_name FROM shortlisted_interns
+        INNER JOIN interns ON shortlisted_interns.intern_ID = interns.intern_ID
+        INNER JOIN companies ON shortlisted_interns.company_ID = companies.company_ID
+        WHERE shortlisted_interns.company_ID = ?
+    `;
+    db.query(query, [companyID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("Shortlisted interns data selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Delete shortlisted intern
+app.delete("/company/:companyID/shortlist/:internID", (req,res) => {
+    const companyID = req.params.companyID;
+    const internID = req.params.internID;
+    db.query('DELETE FROM shortlisted_interns WHERE company_ID = ? AND intern_ID = ?', [companyID, internID], (err, result) => {
+        if(err){
+            console.log("Error deleting the shortlisted intern from the database!", err);
+            return;
+        }
+        console.log("Shortlisted intern data deleted successfully!");
+        res.send({message: "Shortlisted intern data deleted successfully!"});
+    });
+});
+
+//Listen to the port and start the server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}...`);
 });

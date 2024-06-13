@@ -148,7 +148,9 @@ function InternshipDetails(props) {
                         <div className = "col-md-8">
                             <div className = "d-flex flex-column internship-key-details w-100">
                                 <div className = "d-flex internship-title-box">
-                                    <div className = "logo"></div>
+                                    <div className = "logo">
+                                        <img src = {`http://localhost:5000/uploads/${internshipDetails[0].profile_image}`} alt = "Company Logo"/>
+                                    </div>
                                     <div className = "internship-title d-flex flex-column flex-grow-1">
                                         <h3 class = "h3 fw-bolder fs-2">{internshipDetails[0].internship_name}</h3>
                                         <div className = "d-flex justify-content-between align-items-center">
@@ -460,7 +462,9 @@ function InternshipDetails(props) {
                             <div className = "internship-overview w-100 mt-4">
                                 
                                 <div className = "d-flex justify-content-between align-items-center">
-                                    <div className = "icon" style = {{width: "100px", height: "100px"}}></div>
+                                    <div className = "icon" style = {{width: "100px", height: "100px"}}>
+                                        <img src = {`http://localhost:5000/uploads/${internshipDetails[0].profile_image}`} alt = "Company Logo"/>
+                                    </div>
                                     <div style = {{width: "225px"}}><h5 className = "h5 fw-bold fs-5">About {internshipDetails[0].company_Name}</h5></div>
                                 </div>
 

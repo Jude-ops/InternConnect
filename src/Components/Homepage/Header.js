@@ -129,6 +129,12 @@ function Header(props){
                                                     </a>
                                                 </li>
                                                 <li>
+                                                    <a class = "dropdown-item" href = {`/company/${companyID}/saved_interns`}>
+                                                        <i class = "bi bi-journal-text me-2"></i>
+                                                        Shortlisted Interns
+                                                    </a>
+                                                </li>
+                                                <li>
                                                     <a class="dropdown-item" href={`/company/${companyID}/public_profile`}>
                                                         <i class="bi bi-person-circle me-2"></i>
                                                         Public Profile

@@ -9,9 +9,15 @@ function CompanyPublicProfile(props) {
     const {id} = useParams();
     const [companyInfo, setCompanyInfo] = useState(null);
     const [internships, setInternships] = useState(null);
+    const [userType, setUserType] = useState(null);
     const [profileImage, setProfileImage] = useState(null);
 
     useEffect(() => {
+        const storedUserType = localStorage.getItem('userType');
+        if(storedUserType){
+            setUserType(storedUserType);
+        }
+
         async function getCompanyInfo(){
             try{
                 const response = await axios.get(`http://localhost:5000/company/${id}`);
@@ -87,7 +93,7 @@ function CompanyPublicProfile(props) {
                         <div className = "col-md-6 mt-4 mt-md-0">
                             <div className = "d-flex justify-content-md-end align-items-center h-100">
                                 <div className = "download-resume">
-                                    <a href = "#top" className = "btn" role = "button">Posted Jobs</a>
+                                    <a href = "#company-internship-section" className = "btn" role = "button">Posted Jobs</a>
                                 </div>
                             </div>
                         </div>
@@ -109,7 +115,7 @@ function CompanyPublicProfile(props) {
                                 </div>
                                 <hr className = "line-divider my-4"/>
 
-                                <div className = "internship-section">
+                                <div className = "internship-section" id = "company-internship-section">
                                     <h3 className = "header fw-bold mb-3">Open Internship Positions</h3>        
                                     {
                                         internships && internships.map((internship) => {
@@ -278,10 +284,12 @@ function CompanyPublicProfile(props) {
                                 </div>
 
                                 <hr className = "line-divider my-4"/>
-
-                                <div className = "contact-me">
-                                    <button className = "btn">Send Message</button>
-                                </div>
+                                
+                                {userType === "intern" &&
+                                    <div className = "contact-me">
+                                        <button className = "btn">Send Message</button>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
