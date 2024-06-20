@@ -77,7 +77,7 @@ function ShortlistedInterns(props) {
                                                     </div>
                                                 </div>
                                                 <div className = "d-flex justify-content-between">
-                                                    <Link to = "/shortlisted-interns/shortlisted-interns-details" className="btn btn-primary btn-sm">
+                                                    <Link to = {`/chat?companyID=${companyID}&internID=${intern.intern_ID}`} className="btn btn-primary btn-sm">
                                                         <i className="bi bi-chat-dots me-2"></i>
                                                         Message
                                                     </Link>

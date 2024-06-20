@@ -20,6 +20,7 @@ import EducationWorkHistory from "./Components/Intern_Profile/EducationWorkHisto
 import CompanyPublicProfile from "./Components/Company_Profile/CompanyPublicProfile";
 import ShortlistedInterns from "./Components/Company_Profile/ShortlistedInterns";
 import InternshipApplications from "./Components/Company_Profile/InternshipApplications";
+import ChatSection from "./Components/Homepage/ChatSection";
 
  function App() {
 
@@ -97,6 +98,7 @@ const logout = () => {
           <Route path = "/company/:id/public_profile" element = {<CompanyPublicProfile isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/company/:companyID/saved_interns" element = {<ShortlistedInterns isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/company/:id/internship/:internshipID/applications" element = {<InternshipApplications isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/chat" element = {<ChatSection isAuthenticated = {user} logout = {logout} />} />
         </Routes>
       </BrowserRouter>
     </div>

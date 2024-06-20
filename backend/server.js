@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import {dirname, join} from "path";
 import {fileURLToPath} from "url";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const saltRounds = 10;
@@ -21,6 +23,67 @@ app.use(bodyParser.urlencoded({extended: true})); //This is used to parse the da
 app.use(bodyParser.json()); //This is used to parse the data from the form
 app.use(express.static("public")); //This is used to serve static files like css, images, etc.
 app.use('/uploads', express.static('uploads')); // Serve uploaded files
+
+//Create HTTP server and attach socket.io to it
+const server = createServer(app);
+//Create an instance of the socket.io server
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+    }
+});
+
+//Listen for connection event
+io.on("connection", (socket) => {
+    console.log("A user connected!", socket.id);
+
+    //Listen for the "join" event from the client
+    socket.on("join", ({name, room}, callback) => {  
+        console.log(`${name} joined room ${room}`);   
+        socket.broadcast.to(room).emit("message", {user: "admin", text: `${name} has joined the room!`});
+        socket.join(room);
+
+        callback();
+    });
+
+    //Listen for the "message" event from the client
+    socket.on("sendMessage", ({message, userType, companyID, internID, name, room}, callback) => {
+        console.log(`Message from ${name} in room ${room} received: ${message}`);
+
+        //Check if the message is empty
+        if(message.trim() === ""){
+            return callback("Message cannot be empty!");
+        }
+
+        //Check if the user is an intern or a company
+        let senderID, receiverID;
+        if(userType === "intern"){
+            senderID = internID;
+            receiverID = companyID;
+        }else{
+            senderID = companyID;
+            receiverID = internID;
+        }
+
+        //Save the message to the database
+        db.query('INSERT INTO messages (senders_id, user, receivers_id, content, chat_room) VALUES (?,?,?,?,?) ', [senderID, name, receiverID, message, room], (err, result) => {
+            if(err){
+                console.log("Error storing message in database:", err);
+                return;
+            }
+            console.log("Message stored in database!");
+        });
+
+        io.to(room).emit("message", {user: name, content: message});
+        callback();
+    });
+
+    //Listen for the "disconnect" event
+    socket.on("disconnect", () => {
+        console.log("A user disconnected!", socket.id);
+    });
+});
 
 
 // Middleware to verify the token and decode it
@@ -127,7 +190,7 @@ app.post("/register/intern", (req, res) => {
             // Get the internID of the newly inserted intern
             const internID = result.insertId;
 
-            db.query('INSERT INTO users (username,email,password,user_type,is_Active,intern_ID) VALUES (?,?,?,?,?,?) ', [firstName.concat(lastName),emailAddress,hash,userType,isActive,internID], (err, result) => {
+            db.query('INSERT INTO users (username,email,password,user_type,is_Active,intern_ID) VALUES (?,?,?,?,?,?) ', [firstName + " " + lastName,emailAddress,hash,userType,isActive,internID], (err, result) => {
 
                 if(err){
     
@@ -250,6 +313,35 @@ app.post("/login", (req,res) => {
     });
 
 });
+
+//Get corresponding user info from users table based on the companyID
+app.get("/users/company/:companyID", (req,res) => {
+    const companyID = req.params.companyID;
+
+    //
+    db.query('SELECT * FROM users WHERE company_ID = ?', [companyID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("User data selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Get corresponding user info from users table based on the internID
+app.get("/users/intern/:internID", (req,res) => {
+    const internID = req.params.internID;
+    db.query('SELECT * FROM users WHERE intern_ID = ?', [internID], (err, result) => {
+        if(err){
+            console.log("Error selecting the data from the database!", err);
+            return;
+        }
+        console.log("User data selected successfully!");
+        return res.json(result);
+    });
+});
+
 
 //Update intern information
 app.put("/update/intern/:id", upload.single('profileImage'), (req, res) => {
@@ -1174,7 +1266,43 @@ app.delete("/company/:companyID/shortlist/:internID", (req,res) => {
     });
 });
 
+//Fetch chat messages
+app.get("/chat/:id", (req,res) => {
+    const id = req.params.id;
+    db.query('SELECT * FROM messages WHERE chat_room = ? ORDER BY timestamp ASC', [id], (err, result) => {
+        if(err){
+            console.log("Error selecting the messages from the database!", err);
+            return;
+        }
+        console.log("Chats selected successfully!");
+        return res.json(result);
+    });
+});
+
+//Fetch users in a chat room
+app.get("/chat_users/:internID/:companyID", (req,res) => {
+    const internID = req.params.internID;
+    const companyID = req.params.companyID;
+
+    //Select interns and companies from their respective tables
+    db.query('SELECT * FROM interns WHERE intern_ID = ?', [internID], (err, internResult) => {
+        if(err){
+            console.log("Error selecting the intern from the database!", err);
+            return;
+        }
+        db.query('SELECT * FROM companies WHERE company_ID = ?', [companyID], (err, companyResult) => {
+            if(err){
+                console.log("Error selecting the company from the database!", err);
+                return;
+            }
+            console.log("Chat users selected successfully!");
+            return res.json({intern: internResult[0], company: companyResult[0]});
+        });
+    });
+
+});
+
 //Listen to the port and start the server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}...`);
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 });
