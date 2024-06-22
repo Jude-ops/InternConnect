@@ -13,10 +13,13 @@ let socket;
 function ChatSection(props) {
 
     const location = useLocation();
+    const [chatRooms, setChatRooms] = useState([]);
     const [chatUsers, setChatUsers] = useState({});
+    const [userID, setUserID] = useState(null);
     const [userType, setUserType] = useState('');
     const [companyID, setCompanyID] = useState(null);
     const [internID, setInternID] = useState(null);
+    const [isOnline, setIsOnline] = useState(false);
     const [name, setName] = useState('');
     const [room, setRoom] = useState('');
     const [file, setFile] = useState(null);
@@ -25,14 +28,38 @@ function ChatSection(props) {
     const ENDPOINT = 'localhost:5000';
 
     useEffect(() => {
+        socket = io(ENDPOINT, {
+            query: {
+                name: name,
+            }
+        });
+        
+        return () => {            
+            socket.disconnect();
+            socket.off();         
+        }
+    }, [name]);
+
+    useEffect(() => {
         const {companyID, internID} = queryString.parse(location.search);
         setCompanyID(companyID);
         setInternID(internID);
         const userType = localStorage.getItem('userType');
         setUserType(userType);
-
-        socket = io(ENDPOINT)
-        socket.connect();
+        
+        //Setup online/offline status
+        socket.on("userStatus", ({name, isOnline}) => {
+            //First check if user is company or intern
+            if(userType === 'company' && chatUsers.intern){
+                if(name === chatUsers.intern.first_name + ' ' + chatUsers.intern.last_name){
+                    setIsOnline(isOnline);
+                }
+            } else if(userType === 'intern' && chatUsers.company){
+                if(name === chatUsers.company.company_name){
+                    setIsOnline(isOnline);
+                }
+            }
+        });
 
         async function getUserData(){
             try {
@@ -40,6 +67,7 @@ function ChatSection(props) {
                     await axios.get(`http://localhost:5000/users/company/${companyID}`) : 
                     await axios.get(`http://localhost:5000/users/intern/${internID}`);
                 setName(response.data[0].username);
+                setUserID(response.data[0].user_ID);
                 const room = `chat_${companyID}_${internID}`;
                 setRoom(room);
                 socket.emit('join', {name: response.data[0].username , room}, () => {
@@ -49,20 +77,22 @@ function ChatSection(props) {
                 console.log('Error fetching user data:', error);
             }
         }
-        getUserData();    
+        getUserData();
 
-        return () => {
-            
-            socket.disconnect();
-            socket.off();
-            
-        }
-
-    }, [location.search]);
+    }, [location.search, name, chatUsers, userType]);
 
     useEffect(() => {
         socket.on('message', (message) => {
             setMessages([...messages, message]);
+        });
+
+        //Scroll to the last message
+        const chatMessages = document.querySelector('.chat-messages');
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        //Handle new message notification
+        socket.on('newMessageNotification', (message) => {
+            console.log('New message:', message);
         });
 
     }, [messages]);
@@ -71,7 +101,7 @@ function ChatSection(props) {
     useEffect(() => {
         async function fetchMessages(){
             try {
-                const response = await axios.get(`http://localhost:5000/chat/${room}`);
+                const response = await axios.get(`http://localhost:5000/chat/${room && room}`);
                 setMessages(response.data);
             } catch (error) {
                 console.log('Error fetching messages:', error);
@@ -92,6 +122,21 @@ function ChatSection(props) {
 
         fetchMessages();
     }, [room, internID, companyID]);
+
+    //Fetch chat rooms for the user
+    useEffect(() => {
+        async function fetchChatRooms(){
+            try {
+                const response = await axios.get(`http://localhost:5000/chat_rooms/${userID && userID}`);
+                setChatRooms(response.data);
+                console.log('Chat rooms:', response.data);
+            } catch (error) {
+                console.log('Error fetching chat rooms:', error);
+            }
+        }
+
+        fetchChatRooms();
+    }, [userID]);
 
     const sendMessage = (event) => {
         event.preventDefault();
@@ -153,59 +198,51 @@ function ChatSection(props) {
                                             <div className = "title-unread" onClick = {toggleActiveHeading}>Unread</div>
                                         </div>
                                         <ul className = "chat-list">
-                                            <li className = "chat-list-item">
-                                                <a href = "#" className = "chat-list-link">
-                                                    <div className = "d-flex">
-                                                        <div className = "chat-avatar-img">
-                                                            <img 
-                                                                src = {
-                                                                    userType === 'company' ? 
-                                                                    chatUsers.intern && `http://localhost:5000/uploads/${chatUsers.intern.profile_image}` 
-                                                                    : chatUsers.company && `http://localhost:5000/uploads/${chatUsers.company.profile_image}` 
-                                                                } 
-                                                                alt = "Avatar" 
-                                                                className = "img-fluid rounded"
-                                                            />
-                                                        </div>
-                                                        <div className = " ms-3 d-flex flex-column w-100 justify-content-between">
-                                                            <div className = "d-flex justify-content-between">
-                                                                <h6 className = "chat-name fw-bold">
-                                                                    {   
-                                                                        //If the user is a company, show the intern's name, else show the company's name
-                                                                        userType === 'company' ?
-                                                                        chatUsers.intern && chatUsers.intern.first_name + ' ' + chatUsers.intern.last_name
-                                                                        : chatUsers.company && chatUsers.company.company_name
-                                                                    }
-                                                                </h6>
-                                                                <span className = "chat-time">
-                                                                    {   
-                                                                        //If there are messages, show the time of the last message
-                                                                        messages && messages.length > 0 && 
-
-                                                                        //Ensure that the message is not empty before accessing the content
-                                                                        messages[messages.length - 1].content &&
-                                                                        new Date(messages[messages.length - 1].timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                                                                    }
-                                                                </span>
+                                            {chatRooms && chatRooms.map((chatRoom, index) => {
+                                                return (
+                                                    <li key = {index} className = "chat-list-item">
+                                                        <a href = {`/chat?companyID=${userType === 'company' ? chatRoom.company_ID : chatRoom.users[0].company_ID}&internID=${userType === 'intern' ? chatRoom.intern_ID : chatRoom.users[0].intern_ID}`} className = "chat-list-link">
+                                                            <div className = "d-flex">
+                                                                <div className = "chat-avatar-img">
+                                                                    <img 
+                                                                        src = {
+                                                                            chatRoom.users && `http://localhost:5000/uploads/${chatRoom.users[0].profile_image}`
+                                                                        } 
+                                                                        alt = "Avatar" 
+                                                                        className = "img-fluid rounded"
+                                                                    />
+                                                                </div>
+                                                                <div className = " ms-3 d-flex flex-column w-100 justify-content-between">
+                                                                    <div className = "d-flex justify-content-between">
+                                                                        <h6 className = "chat-name">
+                                                                            {chatRoom.users && chatRoom.users[0].username}
+                                                                        </h6>
+                                                                        <span className = "chat-time">
+                                                                            {   
+                                                                                //Remove the seconds from the time
+                                                                                //Check if the time is the current day, if not show the date
+                                                                                new Date(chatRoom.users[0].last_message_timestamp).toLocaleDateString() === new Date().toLocaleDateString() ?
+                                                                                new Date(chatRoom.users[0].last_message_timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                                                                : new Date(chatRoom.users[0].last_message_timestamp).toLocaleDateString()
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className = "chat-message">
+                                                                        <span>
+                                                                            {   
+                                                                                //If the message is greater than 20 characters, show the first 20 characters
+                                                                                chatRoom.users[0].last_message.length > 20 ?
+                                                                                chatRoom.users[0].last_message.substring(0, 20) + '...'
+                                                                                : chatRoom.users[0].last_message
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            <div className = "chat-message">
-                                                                <span>
-                                                                    {   
-                                                                        //If the message is greater than 20 characters, show the first 20 characters
-                                                                        messages && messages.length > 0 && 
-
-                                                                        //Ensure that the message is not empty before accessing the content
-                                                                        messages[messages.length - 1].content &&
-                                                                        messages[messages.length - 1].content.length > 20 ?
-                                                                        messages[messages.length - 1].content.slice(0, 20) + '...'
-                                                                        : messages && messages.length > 0 && messages[messages.length - 1].content && messages[messages.length - 1].content
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </li>
+                                                        </a>
+                                                    </li>
+                                                )
+                                            })}
                                         </ul>
                                     </div>
                                 </div>
@@ -238,10 +275,12 @@ function ChatSection(props) {
                                                     </h5>
                                                     <small className = "chat-status">
                                                         {
-                                                            //If the user is a company, show the intern's professional title, else show the company's location
+                                                            /*If the user is a company, show the intern's professional title, else show the company's location
                                                             userType === 'company' ?
                                                             chatUsers.intern && chatUsers.intern.professional_title
-                                                            : chatUsers.company && chatUsers.company.location_city
+                                                            : chatUsers.company && chatUsers.company.location_city*/
+                                                            //If the other user in the room is online, show the online status, else show the offline status
+                                                            isOnline ? 'Online' : 'Offline'
                                                         }
                                                     </small>
                                                 </div>
@@ -279,12 +318,35 @@ function ChatSection(props) {
                                                     
                                                     const isSentByCurrentUser = message.user === name;
                                                     return (
-                                                        <li key = {index} className = {`d-flex ${isSentByCurrentUser ? 'chat-content-right justify-content-end' : ''}`}>
+                                                        isSentByCurrentUser ?
+                                                        <li key = {index} className = "d-flex chat-content-right justify-content-end">
                                                             <div className = "chat-img">
                                                                 <img 
                                                                     src = {
-                                                                        userType === 'company' ? 
-                                                                        chatUsers.intern && `http://localhost:5000/uploads/${chatUsers.intern.profile_image}` 
+                                                                        userType === 'company' ?
+                                                                        chatUsers.company && `http://localhost:5000/uploads/${chatUsers.company.profile_image}`
+                                                                        : chatUsers.intern && `http://localhost:5000/uploads/${chatUsers.intern.profile_image}`
+                                                                    } 
+                                                                    alt = "Avatar" 
+                                                                    className = "img-fluid"
+                                                                />
+                                                            </div>
+                                                            <div className = "chat-content">
+                                                                <div className = "chat-text">{message.content}</div>
+                                                                <div className = "chat-time">
+                                                                {
+                                                                    //Remove the seconds from the time
+                                                                    new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                                                }</div>
+                                                            </div>
+                                                        </li>
+                                                        :
+                                                        <li key = {index} className = "d-flex">
+                                                            <div className = "chat-img">
+                                                                <img 
+                                                                    src = {
+                                                                        userType === 'company' ?
+                                                                        chatUsers.intern && `http://localhost:5000/uploads/${chatUsers.intern.profile_image}`
                                                                         : chatUsers.company && `http://localhost:5000/uploads/${chatUsers.company.profile_image}`
                                                                     } 
                                                                     alt = "Avatar" 

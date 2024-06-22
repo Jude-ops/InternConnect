@@ -34,58 +34,6 @@ const io = new Server(server, {
     }
 });
 
-//Listen for connection event
-io.on("connection", (socket) => {
-    console.log("A user connected!", socket.id);
-
-    //Listen for the "join" event from the client
-    socket.on("join", ({name, room}, callback) => {  
-        console.log(`${name} joined room ${room}`);   
-        socket.broadcast.to(room).emit("message", {user: "admin", text: `${name} has joined the room!`});
-        socket.join(room);
-
-        callback();
-    });
-
-    //Listen for the "message" event from the client
-    socket.on("sendMessage", ({message, userType, companyID, internID, name, room}, callback) => {
-        console.log(`Message from ${name} in room ${room} received: ${message}`);
-
-        //Check if the message is empty
-        if(message.trim() === ""){
-            return callback("Message cannot be empty!");
-        }
-
-        //Check if the user is an intern or a company
-        let senderID, receiverID;
-        if(userType === "intern"){
-            senderID = internID;
-            receiverID = companyID;
-        }else{
-            senderID = companyID;
-            receiverID = internID;
-        }
-
-        //Save the message to the database
-        db.query('INSERT INTO messages (senders_id, user, receivers_id, content, chat_room) VALUES (?,?,?,?,?) ', [senderID, name, receiverID, message, room], (err, result) => {
-            if(err){
-                console.log("Error storing message in database:", err);
-                return;
-            }
-            console.log("Message stored in database!");
-        });
-
-        io.to(room).emit("message", {user: name, content: message});
-        callback();
-    });
-
-    //Listen for the "disconnect" event
-    socket.on("disconnect", () => {
-        console.log("A user disconnected!", socket.id);
-    });
-});
-
-
 // Middleware to verify the token and decode it
 const verifyToken = (req, res, next) => {
     const token = req.header('Authorization');
@@ -151,6 +99,100 @@ db.connect((err) => {
 
 });
 
+//function to check if user is online or not
+function updateUserStatus(name, isOnline){
+    console.log(`User ${name} is ${isOnline ? "online" : "offline"}`);
+    io.emit("userStatus", {name, isOnline});
+}
+
+//function to insert a new room into the database
+function insertRoom(roomName){
+    db.query('INSERT INTO chat_rooms (room_name) VALUES (?)', [roomName], (err, result) => {
+        if(err){
+            console.log("Error adding the room to the database!", err);
+            return;
+        }
+        console.log("Room inserted successfully!", result);
+        return result.insertId;
+    });
+}
+
+//function to check if a room exists in the database
+function checkRoom(roomName){
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM chat_rooms WHERE room_name = ?', [roomName], (err, result) => {
+            if(err){
+                console.log('Error selecting data', err)
+                reject(err);
+            } else {
+                resolve(result.length > 0);
+            }
+            
+        });    
+    });
+}
+
+//Listen for connection event
+io.on("connection", async (socket) => {
+    console.log("A user connected!", socket.id);
+    const name = socket.handshake.query.name;
+    updateUserStatus(name, true);
+
+    //Listen for the "join" event from the client
+    socket.on("join", async ({name, room}, callback) => {  
+
+       const roomExists = await checkRoom(room);
+       if(!roomExists){
+        insertRoom(room);
+       }
+
+        console.log(`${name} joined room ${room}`);
+        socket.join(room);
+
+        callback();
+    });
+
+    //Listen for the "message" event from the client
+    socket.on("sendMessage", ({message, userType, companyID, internID, name, room}, callback) => {
+        console.log(`Message from ${name} in room ${room} received: ${message}`);
+
+        //Check if the message is empty
+        if(message.trim() === ""){
+            return callback("Message cannot be empty!");
+        }
+
+        //Check if the user is an intern or a company
+        let senderID, receiverID;
+        if(userType === "intern"){
+            senderID = internID;
+            receiverID = companyID;
+        }else{
+            senderID = companyID;
+            receiverID = internID;
+        }
+
+        //Save the message to the database
+        db.query('INSERT INTO messages (senders_id, user, receivers_id, content, chat_room) VALUES (?,?,?,?,?) ', [senderID, name, receiverID, message, room], (err, result) => {
+            if(err){
+                console.log("Error storing message in database:", err);
+                return;
+            }
+            console.log("Message stored in database!");
+        });
+
+        io.to(room).emit("message", {user: name, content: message});
+        //Emit an event for a new message notification
+        io.to(room).emit("newMessageNotification", {user: name, content: message});
+        callback();
+    });
+
+    //Listen for the "disconnect" event
+    socket.on("disconnect", () => {
+        console.log("A user disconnected!", socket.id);
+        updateUserStatus(name, false);
+    });
+});
+
 
 //Registering interns into the database
 app.post("/register/intern", (req, res) => {
@@ -201,7 +243,8 @@ app.post("/register/intern", (req, res) => {
     
                 console.log("User data inserted successfully!", result);
                 const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                res.status(200).json({token, userType, firstName, internID}); 
+                const userId = result.insertId;
+                res.status(200).json({token, userType, firstName, internID, userId}); 
     
             });
 
@@ -257,7 +300,8 @@ app.post("/register/company", (req, res) => {
     
                 console.log("User data inserted successfully!", result);
                 const token = jwt.sign({userId: result.insertId}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
-                res.status(200).json({token, userType, companyID, fullName});
+                const userId = result.insertId;
+                res.status(200).json({token, userType, companyID, fullName, userId});
     
             });
 
@@ -292,7 +336,8 @@ app.post("/login", (req,res) => {
                     const token = jwt.sign({userId: result[0].user_ID}, JWT_SECRET,{expiresIn: '8760h'});  //Generate token which will be used for authentication
                     const companyID = result[0].company_ID;
                     const internID = result[0].intern_ID;
-                    res.status(200).json({token, userType: result[0].user_type, companyID, internID});
+                    const userId = result[0].user_ID;
+                    res.status(200).json({token, userType: result[0].user_type, companyID, internID, userId});
 
                 }else{
 
@@ -1298,6 +1343,78 @@ app.get("/chat_users/:internID/:companyID", (req,res) => {
             console.log("Chat users selected successfully!");
             return res.json({intern: internResult[0], company: companyResult[0]});
         });
+    });
+
+});
+
+//Get chat rooms for a specific user
+app.get("/chat_rooms/:id", (req,res) => {
+    const id = req.params.id;
+    console.log(id);
+
+    //Join chat rooms, chat room users, and users tables to get the chat rooms for a specific user
+    const query = `
+        SELECT chat_rooms.*, users.username, users.user_type, users.intern_ID, users.company_ID FROM chat_rooms
+        INNER JOIN chat_room_users ON chat_rooms.room_name = chat_room_users.room_name
+        INNER JOIN users ON chat_room_users.user_ID = users.user_ID
+        WHERE chat_room_users.user_ID = ?
+    `;
+    db.query(query, [id], (err, result) => {
+        if(err){
+            console.log("Error selecting the chat rooms from the database!", err);
+            return;
+        }
+        console.log("Chat rooms selected successfully!");
+        
+        //Get other user in the chat room
+       const chatRooms = result.map(room => room.room_name);
+        db.query(`
+            SELECT 
+                chat_room_users.*, 
+                users.username, 
+                users.user_type, 
+                users.intern_ID, 
+                users.company_ID, 
+                CASE
+                    WHEN users.user_type = 'intern' THEN interns.profile_image
+                    WHEN users.user_type = 'company' THEN companies.profile_image
+                END AS profile_image,
+                last_message.content AS last_message,
+                last_message.timestamp AS last_message_timestamp
+            FROM chat_room_users
+            JOIN users ON chat_room_users.user_ID = users.user_ID
+            LEFT JOIN companies ON users.user_type = 'company' AND users.company_ID = companies.company_ID
+            LEFT JOIN interns ON users.user_type = 'intern' AND users.intern_ID = interns.intern_ID
+            LEFT JOIN (
+                SELECT 
+                    messages.content,
+                    messages.chat_room,
+                    messages.timestamp
+                FROM messages
+                INNER JOIN (
+                    SELECT 
+                        chat_room,
+                        MAX(timestamp) AS timestamp
+                    FROM messages
+                    GROUP BY chat_room
+                ) AS latest_messages ON messages.chat_room = latest_messages.chat_room AND messages.timestamp = latest_messages.timestamp
+            ) AS last_message ON chat_room_users.room_name = last_message.chat_room
+            WHERE chat_room_users.room_name IN (?)
+            AND chat_room_users.user_ID != ?
+        `, [chatRooms, id], (err, otherUserResult) => {
+            if(err){
+                console.log("Error selecting the other user from the database!", err);
+                return;
+            }
+            console.log("Other user selected successfully!");
+            const roomsWithUsers = result.map(room => ({
+                ...room,
+                users: otherUserResult.filter(user => user.room_name === room.room_name)
+        }));
+
+        return res.json(roomsWithUsers);
+        });
+
     });
 
 });

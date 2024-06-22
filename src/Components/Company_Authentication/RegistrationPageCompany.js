@@ -62,6 +62,10 @@ function RegistrationCompany(props){
                 const companyID = response.data.companyID;
                 localStorage.setItem("companyID", companyID);
                 props.setCompanyID(companyID);
+
+                const userId = response.data.userId;
+                localStorage.setItem("userId", userId);
+                props.setUserId(userId);
                 
                 navigate(`/update/company/${companyID}`);
 

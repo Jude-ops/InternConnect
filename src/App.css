@@ -460,7 +460,7 @@ th{
 .chat-list-body ul{
     padding: 0;
     height: 360px;
-    overflow: hidden;
+    overflow: auto;
 }
 
 .chat-list-item{

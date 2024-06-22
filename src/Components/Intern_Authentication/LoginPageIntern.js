@@ -51,6 +51,10 @@ function LoginIntern(props){
                 localStorage.setItem("internID", internID);
                 props.setInternID(internID);
 
+                const userId = response.data.userId;
+                localStorage.setItem("userId", userId);
+                props.setUserId(userId);
+
                 navigate("/");
 
             };

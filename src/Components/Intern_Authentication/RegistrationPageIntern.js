@@ -63,6 +63,10 @@ function RegistrationIntern(props){
                 localStorage.setItem("internID", internID);
                 props.setInternID(internID);
 
+                const userId = response.data.userId;
+                localStorage.setItem("userId", userId);
+                props.setUserId(userId);
+
                 navigate(`/intern/${internID}/education_work_history`);
 
             };
