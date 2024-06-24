@@ -5,13 +5,14 @@ import SubHeader from './SubHeader'
 import CompanyProfileNavbar from '../Profile_Updates/CompanyProfileNavbar'
 import io from 'socket.io-client'
 import queryString from 'query-string'
-import {useLocation} from 'react-router-dom'
+import {useLocation, useNavigate} from 'react-router-dom'
 import axios from 'axios'
 
 let socket;
 
 function ChatSection(props) {
 
+    const navigate = useNavigate();
     const location = useLocation();
     const [chatRooms, setChatRooms] = useState([]);
     const [chatUsers, setChatUsers] = useState({});
@@ -126,12 +127,16 @@ function ChatSection(props) {
     //Fetch chat rooms for the user
     useEffect(() => {
         async function fetchChatRooms(){
-            try {
-                const response = await axios.get(`http://localhost:5000/chat_rooms/${userID && userID}`);
-                setChatRooms(response.data);
-                console.log('Chat rooms:', response.data);
-            } catch (error) {
-                console.log('Error fetching chat rooms:', error);
+            if(userID){
+                try {
+                    const response = await axios.get(`http://localhost:5000/chat_rooms/${userID}`);
+                    setChatRooms(response.data);
+                    console.log('Chat rooms:', response.data);
+                } catch (error) {
+                    console.log('Error fetching chat rooms:', error);
+                }
+            } else {
+                console.log('User ID not set');
             }
         }
 
@@ -163,6 +168,22 @@ function ChatSection(props) {
 
     function handleFileChange(event){
         setFile(event.target.files[0]);
+    }
+
+    function navigateToVideoChat(intern_Id, userRooms){
+        //Navigate to the video chat page and pass the company's user ID and the user ID of the other user in the room
+        if(userRooms){
+            //Get the specific chatRoom based on internID
+            const internIdNumber = parseInt(intern_Id);
+            const specificChatRoom = userRooms.find(userRoom => userRoom.users.some(user => userType === 'company' ? user.intern_ID : user.company_ID === internIdNumber));
+            if(specificChatRoom){
+                navigate('/video_chat', {state: {chatRoom: specificChatRoom}});
+            } else{
+                console.log("No chatRoom found for the given internID");
+            }
+        } else {
+            console.log("chatRooms array is empty");
+        } 
     }
 
   return (
@@ -286,6 +307,13 @@ function ChatSection(props) {
                                                 </div>
                                             </div>
                                             <div className = "chat-actions d-flex">
+                                                
+                                                <div className = "chat-action-icons d-flex">
+                                                    <button className = "btn" type = "button" onClick={() => {navigateToVideoChat(userType === 'company' ? internID : companyID , chatRooms && chatRooms)}}>
+                                                        <i className = "bi bi-camera-video-fill"></i>
+                                                    </button>
+                                                </div>
+                                    
                                                 <div className="dropdown">
                                                     <button className="btn" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                         <i className = "bi bi-three-dots-vertical"></i>

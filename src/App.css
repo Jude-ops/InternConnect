@@ -524,9 +524,15 @@ th{
 }
 
 .chat-avatar-img img{
+    object-fit: cover !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.chat-avatar-img{
     width: 50px;
     height: 50px;
-    object-fit: cover;
+    overflow: hidden;
 }
 
 .chat-avatar-image img, .chat-img img{
@@ -608,4 +614,14 @@ th{
 .frame-actions{
     padding: 10px;
     cursor: pointer;
+}
+
+.video-container{
+    display: flex;
+    justify-content: center;
+}
+
+.video-options{
+    display: flex;
+    justify-content: center;
 }

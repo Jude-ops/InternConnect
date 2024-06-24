@@ -135,6 +135,7 @@ function checkRoom(roomName){
 //Listen for connection event
 io.on("connection", async (socket) => {
     console.log("A user connected!", socket.id);
+    socket.emit("me", socket.id);
     const name = socket.handshake.query.name;
     updateUserStatus(name, true);
 
@@ -184,6 +185,28 @@ io.on("connection", async (socket) => {
         //Emit an event for a new message notification
         io.to(room).emit("newMessageNotification", {user: name, content: message});
         callback();
+    });
+
+    //Join room for video call
+    socket.on("joinVideoRoom", ({name, room}, callback) => {
+        console.log(`User ${name} joined video room ${room}`);
+        socket.join(room);
+
+        callback();
+    });
+
+    //Implement video call functionality
+    socket.on("callUser", ({userToCall, signalData, callerID, callerName, room}) => {
+        console.log(room);
+        io.to(room).emit("callUser", {signal: signalData, callerID, callerName });
+    });
+
+    socket.on("answerCall", (data) => {
+        io.to(data.to).emit("callAccepted", data.signal);
+    })
+
+    socket.on("endCall", ({room}) => {
+        io.to(room).emit("callEnded");
     });
 
     //Listen for the "disconnect" event
