@@ -60,7 +60,9 @@ function SavedInternships(props) {
                                         <div className="card-body d-flex flex-column justify-content-between">
                                             <div>
                                                 <div className = "d-flex mb-3">
-                                                    <div className = "logo me-3"></div>
+                                                    <div className = "logo me-3">
+                                                        <img src = {`http://localhost:5000/uploads/${internship.profile_image}`} alt = "company logo" className = "img-fluid rounded"/>
+                                                    </div>
                                                     <div className = "d-flex flex-column">
                                                         <h5 className="card-title">{internship.company_Name}</h5>
                                                         <span className="card-subtitle">
@@ -120,7 +122,7 @@ function SavedInternships(props) {
                                                             });
 
                                                             return trimmedSkills.map((skill,index) => {
-                                                                return <div key = {index} className = "badge rounded-pill bg-primary me-2 skill-required">{skill}</div>
+                                                                return <div key = {index} className = "profile-skill me-2">{skill}</div>
                                                             })
                                                         })()
                                                     }

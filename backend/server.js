@@ -360,7 +360,10 @@ app.post("/login", (req,res) => {
                     const companyID = result[0].company_ID;
                     const internID = result[0].intern_ID;
                     const userId = result[0].user_ID;
-                    res.status(200).json({token, userType: result[0].user_type, companyID, internID, userId});
+                    //Get first name of the user
+                    const names = result[0].username.split(" ");
+                    const firstName = names[0];
+                    res.status(200).json({token, userType: result[0].user_type, firstName, companyID, internID, userId});
 
                 }else{
 
@@ -1257,8 +1260,9 @@ app.get("/intern/:id/saved-internships", (req,res) => {
 
     //Join internships and saved_internships tables to get the saved internships
     const query = `
-        SELECT internships.* FROM saved_internships
+        SELECT internships.*, profile_image FROM saved_internships
         INNER JOIN internships ON saved_internships.internship_ID = internships.internship_ID
+        INNER JOIN companies ON internships.company_ID = companies.company_ID
         WHERE saved_internships.intern_ID = ?
     `;
     db.query(query, [internID], (err, result) => {

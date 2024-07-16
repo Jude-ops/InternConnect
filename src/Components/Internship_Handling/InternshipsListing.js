@@ -2,11 +2,14 @@ import React, {useState, useEffect} from 'react'
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import SubHeader from '../Homepage/SubHeader';
 
 function InternshipsListing(props) {
 
+    const navigate = useNavigate();
+    const [token, setToken] = useState(null);
+    const [userType, setUserType] = useState(null);
     const [internships, setInternships] = useState([]);
     const [internID, setInternID] = useState(null);
     const [filteredInternships, setFilteredInternships] = useState([]);
@@ -32,8 +35,12 @@ function InternshipsListing(props) {
 
     useEffect(() => {
 
+        const token = localStorage.getItem("token");
+        setToken(token);
         const internID = localStorage.getItem("internID");
         setInternID(internID);
+        const userType = localStorage.getItem("userType");
+        setUserType(userType);
 
        async function fetchInternships(){
            try{
@@ -126,16 +133,19 @@ function InternshipsListing(props) {
 
     async function saveInternship(internshipID){
 
-        const token = localStorage.getItem("token");
-        const userType = localStorage.getItem("userType");
-
         if(!token){
-            alert("You need to be logged in to save internships");
+            alert("You are not logged in. Please log in to save internships.")
+            navigate("/login");
             return;
         }
 
         if(userType !== "intern"){
-            alert("Only interns can save internships");
+            const errorMessage = document.querySelector(".login-error-message");
+            errorMessage.classList.remove("hidden");
+            errorMessage.innerHTML = "Only interns can save internships!";
+            setTimeout(() => {
+                errorMessage.classList.add("hidden");
+            }, 3000);
             return;
         }
 
@@ -149,6 +159,15 @@ function InternshipsListing(props) {
         }catch(err){
             console.log("Error saving internship:", err);
         }
+    }
+
+    function handleClick(internship_ID){
+        if(!token){
+            alert("You are not logged in. Please login to view internship details.");
+            navigate("/login"); // Navigate to login page
+            return;
+        }
+        navigate(`/internship/${internship_ID}`);
     }
 
   return (
@@ -165,6 +184,9 @@ function InternshipsListing(props) {
           <div className="col-12">
             <h3 className="h3 fw-bold">{internships.length} Total Internships Available</h3>
             <p className="fst-italic"><span className="fw-bold">Note:</span> Internships are updated regularly. Check back often for new listings.</p>
+            <div className = "w-50 mx-auto">
+                <p className = "hidden text-center login-error-message"></p>
+            </div>
           </div>
         </div>
 
@@ -172,8 +194,8 @@ function InternshipsListing(props) {
             <div className="col-12 col-md-4" style = {{position: "sticky", top: "30px", height: "100%"}}>
                 <div className = "internship-overview internship-filters w-100">
                     <div className = "filter-section">
-                        <h4>Filters</h4>
-                        <hr style = {{width: "30%"}}/>
+                        <h4 style = {{color: "#2980B9"}}>Filters</h4>
+                        <hr style = {{width: "30%"}} className = "line-divider" />
                     </div>
 
                     <div className="form-group">
@@ -455,7 +477,7 @@ function InternshipsListing(props) {
 
                                 <div className = "d-flex justify-content-end mt-4">
                                     <div><i className = "bi bi-heart h3 me-4 save-internship-icon" onClick={() =>{saveInternship(internship.internship_ID)}}></i></div>
-                                    <Link to = {`/internship/${internship.internship_ID}`}><button className="btn btn-primary btn-sm">View Details</button></Link>
+                                    <button className="btn btn-primary btn-sm" onClick={()=> {handleClick(internship.internship_ID)}}>View Details</button>
                                 </div>
                                 
                             </div>

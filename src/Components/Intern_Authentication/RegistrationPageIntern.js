@@ -10,6 +10,9 @@ function RegistrationIntern(props){
 
     const navigate = useNavigate();
 
+    const [description1Touched, setDescription1Touched] = useState(false);
+    const [description2Touched, setDescription2Touched] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [internInfo,setInternInfo] = useState({
         firstName: "",
         lastName: "",
@@ -27,16 +30,26 @@ function RegistrationIntern(props){
         telephone: ""
     });
 
+    function handleDescriptionBlur(event){
+        const {name} = event.target;
+        if(name === "description"){
+            setDescription1Touched(true);
+        } else if(name === "skills"){
+            setDescription2Touched(true);
+        }
+    };
+
+    function toggleShowPassword(){
+        setShowPassword(!showPassword);
+    }
     
     function handleChange(name, value){
-
         setInternInfo(prevValue => {
             return{
                 ...prevValue,
                 [name]: value
             }
         });
-
     }
 
    async function handleSubmit(event){
@@ -44,6 +57,13 @@ function RegistrationIntern(props){
         event.preventDefault();
         
         try{
+
+            //Verify if all input fields are filled and valid before sending a POST request
+           const form = event.target.closest("form")
+           if(!form.checkValidity()){
+            form.reportValidity();
+            return;
+           }
 
             const response = await axios.post("http://localhost:5000/register/intern", internInfo);
 
@@ -67,6 +87,10 @@ function RegistrationIntern(props){
                 localStorage.setItem("userId", userId);
                 props.setUserId(userId);
 
+                const firstName = response.data.firstName;
+                localStorage.setItem("firstName", firstName);
+                props.setFirstName(firstName);
+
                 navigate(`/intern/${internID}/education_work_history`);
 
             };
@@ -88,7 +112,7 @@ function RegistrationIntern(props){
                 subtitle = "Sign Up and Apply for free on InternConnect!"
             />
             <div className = "container my-5 mx-auto p-3">
-                <h2 className = "text-center fw-bold">Intern Registration Portal</h2>
+                <h2 className = "text-center fw-bold" style = {{color: "#2980B9"}}>Intern Registration Portal</h2>
                 <div className = "row mt-4">
                     <div className = "col-12">
                         <form className = "registration-form" style = {{width: "75%"}} method = "post" action = "/register/intern">
@@ -102,7 +126,7 @@ function RegistrationIntern(props){
                                         labelTitle = "First Name"
                                         onChange = {handleChange}
                                         value = {internInfo.firstName}
-                                        storedValue = {internInfo.firstName}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
 
@@ -115,6 +139,7 @@ function RegistrationIntern(props){
                                         labelTitle = "Last Name"
                                         onChange = {handleChange}
                                         value = {internInfo.lastName}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
                             </div>
@@ -129,6 +154,7 @@ function RegistrationIntern(props){
                                         labelTitle = "Email Address"
                                         onChange = {handleChange}
                                         value = {internInfo.emailAddress}
+                                        errorMessage = {internInfo.emailAddress === "" ? "Input field should not be empty!" : "Invalid email address!"}
                                     />
                                 </div>
 
@@ -141,6 +167,7 @@ function RegistrationIntern(props){
                                         labelTitle = "Professional Title"
                                         onChange = {handleChange}
                                         value = {internInfo.professionalTitle}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
                             </div>
@@ -155,6 +182,7 @@ function RegistrationIntern(props){
                                         labelTitle = "Date of Birth"
                                         onChange = {handleChange}
                                         value = {internInfo.dateOfBirth}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
 
@@ -167,6 +195,7 @@ function RegistrationIntern(props){
                                         labelTitle = "Age"
                                         onChange = {handleChange}
                                         value = {internInfo.age}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
                             </div>
@@ -174,6 +203,7 @@ function RegistrationIntern(props){
                             <div className="mb-3">
                                 <label for="description" className="form-label fw-bold">Short Description</label>
                                 <textarea
+                                    required
                                     className="form-control"
                                     id="description"
                                     name = "description"
@@ -183,32 +213,50 @@ function RegistrationIntern(props){
                                     onChange = {(event) => {
                                         handleChange(event.target.name, event.target.value)
                                     }}
+                                    onBlur = {handleDescriptionBlur}
+                                    isTouched = {description1Touched ? "true" : "false"}
                                 ></textarea>
+                                <p className = "reg-error-message">Input field should not be empty!</p>
                             </div>
 
                             <div className = "row">
                                 <div className = "col-12 col-sm-6">  
                                     <FormElement 
                                         labelFor = "password" 
-                                        type = "password" 
+                                        type = {showPassword ? "text" : "password"}
                                         id = "password" 
                                         name = "password" 
                                         labelTitle = "Password"
                                         onChange = {handleChange}
                                         value = {internInfo.password}
+                                        // Password should be minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character
+                                        pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@!#%*?&])[A-Za-z\d@!#%*?&]{8,}$" 
+                                        errorMessage = {internInfo.password === "" ? "Input field should not be empty!" : "Password should be minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character!"}
                                     />
                                 </div>
 
                                 <div className = "col-12 col-sm-6">
                                     <FormElement 
                                         labelFor = "confirmPassword" 
-                                        type = "password" 
+                                        type = {showPassword ? "text" : "password"} 
                                         id = "confirmPassword" 
                                         name = "confirmPassword" 
                                         labelTitle = "Confirm Password"
                                         onChange = {handleChange}
                                         value = {internInfo.confirmPassword}
+                                        pattern = {internInfo.password}
+                                        errorMessage = {internInfo.confirmPassword === "" ? "Input field should not be empty" : "Passwords do not match!"}
                                     />
+                                </div>
+                                <div className = "col-12 mb-3">
+                                    <input 
+                                        type = "checkbox"
+                                        id = "showPassword"
+                                        checked = {showPassword}
+                                        onChange = {toggleShowPassword}
+                                        className = "form-check-input me-2"
+                                    />
+                                    <label htmlFor="showPassword" className = "form-check-label fw-bold">Show Password</label>
                                 </div>
                             </div>
 
@@ -223,6 +271,7 @@ function RegistrationIntern(props){
                                         placeholder = "e.g. Bamenda"
                                         onChange = {handleChange}
                                         value = {internInfo.location}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
 
@@ -236,6 +285,7 @@ function RegistrationIntern(props){
                                         placeholder = "e.g. Mile 2 Nkwen"
                                         onChange = {handleChange}
                                         value = {internInfo.address}
+                                        errorMessage = "Input field should not be empty!"
                                     />
                                 </div>
                             </div>
@@ -245,6 +295,7 @@ function RegistrationIntern(props){
                                     <div className="mb-3">
                                         <label for="skillsRequired" class="form-label fw-bold">My Skill(s)</label>
                                         <textarea
+                                            required
                                             className="form-control"
                                             placeholder = "e.g. Web Development, Graphic Design, etc." 
                                             id="skills" 
@@ -254,7 +305,10 @@ function RegistrationIntern(props){
                                             onChange={(event) => {
                                                 handleChange(event.target.name, event.target.value)
                                             }}
-                                        ></textarea> 
+                                            onBlur={handleDescriptionBlur}
+                                            isTouched = {description2Touched ? "true" : "false"}
+                                        ></textarea>
+                                        <p className = "reg-error-message">Input field should not be empty!</p> 
                                     </div>
                                 </div>
 
@@ -268,6 +322,8 @@ function RegistrationIntern(props){
                                         placeholder = "e.g. 678123456"
                                         onChange = {handleChange}
                                         value = {internInfo.telephone}
+                                        pattern = "^[6]{1}[0-9]{8}$" // Telephone number should start with 6 and have 9 digits
+                                        errorMessage = {internInfo.telephone === "" ? "Input field should not be empty!" : "Telephone number should start with 6 and have 9 digits!"}
                                     />
 
                                     <div>
@@ -307,6 +363,7 @@ function RegistrationIntern(props){
                                         />
                                         <label className ="form-check-label" for="female">Female</label>
                                     </div>
+                                    <p className = "reg-error-message">At least one box should be checked!</p>
                                 </div>
                             </div>
                                    

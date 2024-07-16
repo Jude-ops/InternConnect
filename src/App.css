@@ -170,7 +170,7 @@ textarea:focus{
 }
 
 .modal-header{
-    background-color: #0B5ED7;
+    background-color: #2980B9;
     color: white;
 }
 
@@ -624,4 +624,83 @@ th{
 .video-options{
     display: flex;
     justify-content: center;
+}
+
+#modal-close-button{
+    color: #fff !important;
+    background-color: #2980B9 !important;
+    opacity: 1 !important;
+}
+
+.hidden{
+    display: none;
+}
+
+.login-error-message{
+    padding: 10px;
+    background-color: #F8D7DA;
+    color: #721C24;
+    border: 1px solid #F5C6CB;
+    border-radius: 10px;
+}
+
+.login-success-message{
+    padding: 10px;
+    background-color: #D4EDDA;
+    color: #155724;
+    border: 1px solid #C3E6CB;
+    border-radius: 10px;
+}
+
+.active-link{
+    color: #2980B9 !important;
+    border-bottom: 3px solid #2980B9 !important;
+}
+
+p.reg-error-message{
+    display: none;
+    color: #cd5c65;
+    font-size: smaller !important;
+}
+
+input:focus:invalid, 
+select:focus:invalid, 
+textarea:focus:invalid{
+    border-color: #cd5c65 !important;
+}
+
+input:invalid[isTouched = "true"], 
+select:invalid[isTouched = "true"], 
+textarea:invalid[isTouched = "true"]{
+    border-color: #cd5c65 !important;
+}
+
+input:valid, select:valid, textarea:valid{
+    border-color: #2980B9 !important;
+}
+
+input:focus:invalid ~ p.reg-error-message, 
+select:focus:invalid ~ p.reg-error-message, 
+textarea:focus:invalid ~ p.reg-error-message{
+    display: block;
+    color: #cd5c65;
+}
+
+input:invalid[isTouched = "true"] ~ p.reg-error-message,
+select:invalid[isTouched = "true"] ~ p.reg-error-message,
+textarea:invalid[isTouched = "true"] ~ p.reg-error-message{
+    display: block;
+    color: #cd5c65;
+}
+
+#keywordSearchButton{
+    background-color: white;
+    color: #2980B9;
+    border: 1px solid #2980B9;
+    transition: all 0.3s linear;
+}
+
+#keywordSearchButton:hover{
+    background-color: #2980B9;
+    color: white;
 }

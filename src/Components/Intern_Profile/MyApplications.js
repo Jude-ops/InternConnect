@@ -82,7 +82,11 @@ function MyApplications(props) {
                                     <tr key = {application.application_ID}>
                                         <td>
                                             <div className = "d-flex">
-                                                <div className = "logo me-3"></div>
+                                                <div className = "logo">
+                                                    {internshipDetails[index] && ( 
+                                                        <img src = {`http://localhost:5000/uploads/${internshipDetails[index][0].profile_image}`} alt = "company logo" className = "img-fluid rounded"/>
+                                                    )}
+                                                </div>
                                                 {internshipDetails[index] && (
                                                     <Link to = {`/internship/${application.internship_ID}`} style = {{textDecoration: "none", color: "black"}}>
                                                         {internshipDetails[index][0].internship_name}

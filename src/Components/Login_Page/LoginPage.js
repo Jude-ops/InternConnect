@@ -4,7 +4,7 @@ import Footer from "../Homepage/Footer";
 import LoginCompany from "../Company_Authentication/LoginPageCompany";
 import LoginIntern from "../Intern_Authentication/LoginPageIntern";
 
-function LoginPage({setToken, isAuthenticated, setUserType, setInternID, setCompanyID, setUserId}){
+function LoginPage({setToken, isAuthenticated, setUserType, setInternID, setCompanyID, setUserId, setFirstName}){
 
     const [isIntern,setForm] = useState(true);
     const [isClicked,setClick]  = useState(true);
@@ -30,6 +30,7 @@ function LoginPage({setToken, isAuthenticated, setUserType, setInternID, setComp
                     setUserType = {setUserType}
                     setInternID = {setInternID}
                     setUserId = {setUserId}
+                    setFirstName = {setFirstName}
                 /> 
                 : <LoginCompany 
                     onCompany = {displayCompanyForm} 
@@ -39,6 +40,7 @@ function LoginPage({setToken, isAuthenticated, setUserType, setInternID, setComp
                     setUserType = {setUserType}
                     setCompanyID = {setCompanyID}
                     setUserId = {setUserId}
+                    setFirstName = {setFirstName}
                 />
             }
             <Footer />

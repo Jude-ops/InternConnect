@@ -3,14 +3,25 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SubHeader from "./SubHeader";
 
 function InternshipCard(props){
 
+    const navigate = useNavigate();
+    const [token, setToken] = useState(null);
+    const [firstName, setFirstName] = useState("");
+    const [userType, setUserType] = useState("");
     const [internshipData, setInternshipData] = useState([]);
 
     useEffect(() => {
+
+        const token = localStorage.getItem("token");
+        setToken(token);
+        const firstName = localStorage.getItem("firstName");
+        setFirstName(firstName);
+        const userType = localStorage.getItem("userType");
+        setUserType(userType);
 
         async function fetchData(){
             try{
@@ -26,35 +37,51 @@ function InternshipCard(props){
     }, []);
 
     async function saveInternship(internship_ID){
-            
-        const token = localStorage.getItem("token");
-        const userType = localStorage.getItem("userType");
+        
         const internID = localStorage.getItem("internID");
 
         if(!token){
             alert("Please login to save internships");
+            navigate("/login"); // Navigate to login page
             return;
         }
 
         if(userType !== "intern"){
-            alert("Only interns can save internships");
+            //Get the alert element and display the alert for a few seconds
+            const alertElement = document.querySelector(".login-error-message");
+            alertElement.classList.remove("hidden");
+            setTimeout(() => {
+                alertElement.classList.add("hidden");
+            }, 3000);
             return;
         }
 
         try {
-            const response = await axios.post(`http://localhost:5000/intern/${internID}/saved-internships`, {
+            await axios.post(`http://localhost:5000/intern/${internID}/saved-internships`, {
                 internship_ID: internship_ID
             }, {
                 headers: {
                     Authorization: token
                 }
             });
-
-            alert(response.data.message);
-
+            //Get the alert element and display the alert for a few seconds
+            const alertElement = document.querySelector(".login-success-message");
+            alertElement.classList.remove("hidden");
+            setTimeout(() => {
+                alertElement.classList.add("hidden");
+            }, 3000);
         } catch (error) {
             console.log('Error saving internship:', error);
         }
+    }
+
+    function handleClick(internship_ID){
+        if(!token){
+            alert("Please login to view internship details");
+            navigate("/login"); // Navigate to login page
+            return;
+        }
+        navigate(`/internship/${internship_ID}`);
     }
 
 
@@ -81,8 +108,8 @@ function InternshipCard(props){
         <div>
 
             <SubHeader 
-                title = "Welcome to InternConnect!"
-                subtitle = "Let's help you find your internship quickly"
+                title = {token ? `Welcome, ${firstName}` : "Welcome to InternConnect!"}
+                subtitle = {token && userType === "intern" ? "Let's help you find your internship quickly!" : "Find the latest internships here!"}
             />
 
             <div className = "internshipCardComponent">
@@ -92,6 +119,10 @@ function InternshipCard(props){
                 <div className="container mt-5">
 
                     <div className="row">
+                        <div className = "w-50 mx-auto">
+                            <p className = "text-center hidden login-success-message">Internship saved successfully!</p>
+                            <p className = "text-center hidden login-error-message">Only interns can save internships!</p>
+                        </div>
 
                         <Slider {...settings}>
                             {internshipData.map((internship) => {
@@ -168,7 +199,7 @@ function InternshipCard(props){
                                             </p>
 
                                             <div className = "d-flex justify-content-between align-items-end">
-                                                <Link to = {`/internship/${internship.internship_ID}`}><button className="btn btn-primary mt-4">View Details</button></Link>
+                                                <button className="btn btn-primary mt-4" onClick = {() => {handleClick(internship.internship_ID)}}>View Details</button>
                                                 <div className = "me-2"><i class="bi bi-heart h4 save-internship-icon" onClick={() => {saveInternship(internship.internship_ID)}}></i></div>
                                             </div>
                                         </div>

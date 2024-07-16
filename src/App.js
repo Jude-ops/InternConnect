@@ -30,6 +30,7 @@ import VideoChat from "./Components/Communication/VideoChat";
   const [companyID, setCompanyID] = useState(null);
   const [internID, setInternID] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [firstName, setFirstName] = useState("");
 
 
   useEffect(() => {
@@ -60,7 +61,12 @@ import VideoChat from "./Components/Communication/VideoChat";
       setUserId(storedUserId);
     }
 
-  }, [companyID, internID, token, userType, userId])
+    const storedFirstName = localStorage.getItem('firstName');
+    if(storedFirstName){
+      setFirstName(storedFirstName);
+    }
+
+  }, [companyID, internID, token, userType, userId, firstName]);
 
 const user = () => {
 
@@ -81,6 +87,8 @@ const logout = () => {
   setInternID("");
   localStorage.removeItem("userId");
   setUserId("");
+  localStorage.removeItem("firstName");
+  setFirstName("");
 
 };
 
@@ -88,10 +96,10 @@ const logout = () => {
     <div>
       <BrowserRouter>
         <Routes>
-          <Route path = "/" element = { user() ? <Homepage isAuthenticated = {user} logout = {logout} />: <Navigate to = "/login" /> } />
-          <Route path = "/register/intern" element = {<RegistrationIntern isAuthenticated = {user} setToken = {setToken}  setUserType = {setUserType} setInternID = {setInternID} setUserId = {setUserId}/>} />
-          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} isAuthenticated = {user} setUserType = {setUserType} setCompanyID = {setCompanyID} setInternID = {setInternID} setUserId = {setUserId}/>} />
-          <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} setUserType = {setUserType} setCompanyID = {setCompanyID} setUserId = {setUserId}/>} />
+          <Route path = "/" element = { <Homepage isAuthenticated = {user} logout = {logout} /> } />
+          <Route path = "/register/intern" element = {<RegistrationIntern isAuthenticated = {user} setToken = {setToken}  setUserType = {setUserType} setInternID = {setInternID} setUserId = {setUserId} setFirstName = {setFirstName}/>} />
+          <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} isAuthenticated = {user} setUserType = {setUserType} setCompanyID = {setCompanyID} setInternID = {setInternID} setUserId = {setUserId} setFirstName = {setFirstName}/>} />
+          <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} setUserType = {setUserType} setCompanyID = {setCompanyID} setUserId = {setUserId} setFirstName={setFirstName}/>} />
           <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} />} />
           <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} />} />
           <Route path = "/post_internship" element = { user() && <PostInternship isAuthenticated = {user}/>} />

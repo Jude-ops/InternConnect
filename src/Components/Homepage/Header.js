@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 import axios from "axios";
+import mainLogo from "../../app-logo1.png";
 
 function Header(props){
 
+    const location = useLocation();
     const [userId, setUserId] = useState(null);
     const [userType, setUserType] = useState(null);
     const [companyID, setCompanyID] = useState(null);
@@ -42,16 +44,30 @@ function Header(props){
 
     }, [userId]);
 
+    useEffect(() => {
+        const headerLinks = document.querySelectorAll("#header-link");
+
+        headerLinks.forEach(link => {
+            if(new URL(link.href).pathname === location.pathname) {
+                link.classList.add("active-link");
+                link.classList.remove("text-secondary");
+              } else {
+                link.classList.remove("active-link");
+                link.classList.add("text-secondary");
+            }
+        });
+
+    }, [location]);
 
     return(
 
         
         <div>
 
-            <header className="text-bg-light navbar navbar-expand-lg" style = {{padding: "20px"}}>
+            <header className="text-bg-light navbar navbar-expand-lg" style = {{padding: "13px 15px"}}>
                 <div className="container d-flex flex-wrap align-items-center justify-content-between justify-content-lg-start" style = {{padding: "0px 15px", width: "84%"}}>
                     <a href="/" className="navbar-brand d-flex align-items-start mb-2 mb-lg-0 text-dark text-decoration-none">
-                        <span>InternConnect</span> 
+                        <img src = {mainLogo} alt = "InternConnect" style = {{width: "150px", height: "50px"}} /> 
                     </a>
 
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +77,7 @@ function Header(props){
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
 
                         <ul className="navbar-nav me-auto col-12 col-lg-auto me-lg-auto mb-2 ms-5 justify-content-center mb-md-0">
-                            <li className = "nav-item mx-3"><a href = "/" className="nav-link px-2 text-dark" id = "header-link">Home</a></li>
+                            <li className = "nav-item mx-3"><a href = "/" className="nav-link px-2 text-secondary" id = "header-link">Home</a></li>
                             <li className = "nav-item mx-3"><a href = "/internships" className="nav-link px-2 text-secondary" id = "header-link">Internships</a></li>
                             <li className = "nav-item mx-3"><a href = "/about" className="nav-link px-2 text-secondary" id = "header-link">About</a></li>
                         </ul>
@@ -159,7 +175,7 @@ function Header(props){
                             </div> 
                             : 
                             <div className="d-flex">
-                                <Link to = "/login"><button type="button" className="btn me-2" id = "login-button">Login</button></Link>
+                                <Link to = "/login"><button type="button" className="btn me-2" id = "login-button"><i className = "bi bi-door-open me-2"></i>Login</button></Link>
                                 <div class="btn-group">
                                     <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Register

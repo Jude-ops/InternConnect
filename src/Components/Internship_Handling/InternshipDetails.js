@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
@@ -9,7 +9,6 @@ import SubHeader from '../Homepage/SubHeader';
 function InternshipDetails(props) {
 
     const { id } = useParams();
-    const navigate = useNavigate();
     const fileInput = useRef();
     const [internshipDetails, setInternshipDetails] = useState(null);
     const [userType, setUserType] = useState("");
@@ -33,30 +32,19 @@ function InternshipDetails(props) {
     }
 
     async function getInternDetails() {
-
         try {
-
-            //Check if user is logged in
-            if (!localStorage.getItem("internID")) {
-                alert("Please login to apply for this internship.");
-                navigate("/login");
-            } else {
-
-                const response = await axios.get(`http://localhost:5000/intern/info/${internID}`);
-                setApplication((prevValue) => {
-                    return {
-                        ...prevValue,
-                        fullName: response.data[0].first_name + " " + response.data[0].last_name,
-                        email: response.data[0].email_address,
-                        phone: response.data[0].telephone
-                    }
-                })
-            }
-
+            const response = await axios.get(`http://localhost:5000/intern/info/${internID}`);
+            setApplication((prevValue) => {
+                return {
+                    ...prevValue,
+                    fullName: response.data[0].first_name + " " + response.data[0].last_name,
+                    email: response.data[0].email_address,
+                    phone: response.data[0].telephone
+                }
+            })        
         } catch (error) {
             console.log('Error fetching intern details:', error);
         }
-
     };
 
     async function handleApplicationSubmit(event) {
@@ -269,14 +257,16 @@ function InternshipDetails(props) {
                                 </div>
                     
                             </div>
-
-                            <div className = "mt-5">
-                                <Link to = {`/company/${internshipDetails[0].company_ID}/internship/${internshipDetails[0].internship_ID}/edit`}>
-                                    <button type = "button" className = "btn btn-primary">
-                                        Edit Internship
-                                    </button>
-                                </Link>
-                            </div>
+                            
+                            {userType === "company" &&
+                                <div className = "mt-5">
+                                    <Link to = {`/company/${internshipDetails[0].company_ID}/internship/${internshipDetails[0].internship_ID}/edit`}>
+                                        <button type = "button" className = "btn btn-primary">
+                                            Edit Internship
+                                        </button>
+                                    </Link>
+                                </div>
+                            }
 
                             {userType === "intern" && 
 
@@ -294,7 +284,7 @@ function InternshipDetails(props) {
                                             <div class="modal-content">
                                                 <div class="modal-header text-center">
                                                     <h5 class="modal-title fw-bold text-uppercase w-100" id="exampleModalLabel">Apply for Internship</h5>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button id = "modal-close-button" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
                                                 <form>

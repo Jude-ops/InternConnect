@@ -1,7 +1,12 @@
-import React from "react";
+import React, {useState} from "react";
 
 function FormElement(props){
 
+    const [isTouched, setIsTouched] = useState(false);
+
+    const handleBlur = (event) => {
+        setIsTouched(true);
+    };
 
     return(
         <div className="mb-3">
@@ -18,7 +23,11 @@ function FormElement(props){
                     }
                 }
                 value = {props.value}
+                pattern = {props.pattern}
+                onBlur={handleBlur}
+                isTouched = {isTouched.toString()}
             />
+            <p className = "reg-error-message">{props.errorMessage}</p>
         </div>
     );
 

@@ -12,20 +12,23 @@ function LoginCompany(props){
         borderBottom: props.clicked ? "2px solid #2980B9" : "none"
     }
 
+    const [showPassword, setShowPassword] = useState(false);
     const [companyLoginInfo, setCompanyLoginInfo] = useState({
         emailAddress: "",
         password: ""
     })
 
     function handleChange(name, value){
-
         setCompanyLoginInfo(prevValue => {
             return{
                 ...prevValue,
                 [name]: value
             }
         })
+    }
 
+    function toggleShowPassword(){
+        setShowPassword(!showPassword);
     }
 
     async function handleLogin(event){
@@ -37,11 +40,18 @@ function LoginCompany(props){
 
             if(response.data.token){
 
+                const userType = response.data.userType;
+                //If userType is not company, redirect to intern login page
+                if(userType !== "company"){
+                    alert("You are not a company. Please login as an intern.");
+                    props.onIntern();
+                    return;
+                }
+
                 const token = response.data.token;
                 localStorage.setItem("token", token);
                 props.setToken(token);
 
-                const userType = response.data.userType;
                 localStorage.setItem("userType", userType);
                 props.setUserType(userType);
 
@@ -55,8 +65,19 @@ function LoginCompany(props){
                 localStorage.setItem("userId", userId);
                 props.setUserId(userId);
 
+                const firstName = response.data.firstName;
+                localStorage.setItem("firstName", firstName);
+                props.setFirstName(firstName);
+
                 navigate("/");
 
+            } else{
+                const errorMessage = document.querySelector(".login-error-message");
+                errorMessage.classList.remove("hidden");
+                errorMessage.innerHTML = "Wrong email/password combination! Please try again.";
+                setTimeout(() => {
+                    errorMessage.classList.add("hidden");
+                }, 3000);
             };
 
         } catch (error) {
@@ -69,7 +90,7 @@ function LoginCompany(props){
 
             <div className = "container my-5 p-3" style = {{width:"450px"}}>
 
-                <h2 className = "text-center fw-normal">Company Portal</h2>
+                <h2 className = "text-center fw-normal" style = {{color: "#2980B9"}}>Company Portal</h2>
                 <h3 className = "text-center fw-bold h3-responsive">Login to your account</h3>
 
                 <div className = "row my-3" style = {{width:"75%",margin:"0px auto"}}>
@@ -92,21 +113,32 @@ function LoginCompany(props){
                                 labelTitle = "Email address"
                                 onChange = {handleChange}
                                 value = {companyLoginInfo.emailAddress}
+                                errorMessage = {companyLoginInfo.emailAddress === "" ? "Input field should not be empty!" : "Invalid email address!"}
                             />
  
                             <FormElement 
                                 labelFor = "password" 
-                                type = "password" 
+                                type = {showPassword ? "text" : "password"} 
                                 id = "password" 
                                 name = "password" 
                                 labelTitle = "Password"
                                 onChange = {handleChange}
                                 value = {companyLoginInfo.password}
+                                errorMessage = "Input field should not be empty!"
                             />
 
-                            <div className = "mb-3">
-                                <Link to = "/forgotpassword" style = {{textDecoration: "none", color: "#2980B9"}}>Forgot Password?</Link>
+                            <div className = "col-12 mb-3">
+                                <input 
+                                    type = "checkbox"
+                                    id = "showPassword"
+                                    checked = {showPassword}
+                                    onChange = {toggleShowPassword}
+                                    className = "form-check-input me-2"
+                                />
+                                <label htmlFor="showPassword" className = "form-check-label fw-bold">Show Password</label>
                             </div>
+
+                            <p className = "mt-3 hidden login-error-message" style = {{fontSize: "14px"}}></p>
 
                             <div id = "submitButton" className = "mt-5">
                                 <button type="submit" className="btn btn-primary" onClick = {handleLogin}>Login</button>
