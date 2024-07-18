@@ -3,9 +3,10 @@ import Header from './Header'
 import Footer from './Footer'
 import SubHeader from './SubHeader'
 import CompanyProfileNavbar from '../Profile_Updates/CompanyProfileNavbar'
+import InternProfileNavbar from '../Intern_Profile/InternProfileNavbar'
 import io from 'socket.io-client'
 import queryString from 'query-string'
-import {useLocation, useNavigate} from 'react-router-dom'
+import {useLocation, useNavigate, useParams} from 'react-router-dom'
 import axios from 'axios'
 
 let socket;
@@ -14,6 +15,7 @@ function ChatSection(props) {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const {userId} = useParams();
     const [chatRooms, setChatRooms] = useState([]);
     const [chatUsers, setChatUsers] = useState({});
     const [userID, setUserID] = useState(null);
@@ -136,18 +138,25 @@ function ChatSection(props) {
                     console.log('Error fetching chat rooms:', error);
                 }
             } else {
-                console.log('User ID not set');
+                //If the user ID is not available, use the userId from the useParams hook
+                try {
+                    const response = await axios.get(`http://localhost:5000/chat_rooms/${userId}`);
+                    setChatRooms(response.data);
+                    console.log('Chat rooms:', response.data);
+                } catch (error) {
+                    console.log('Error fetching chat rooms:', error);
+                }
             }
         }
 
         fetchChatRooms();
-    }, [userID]);
+    }, [userID, userId]);
 
     const sendMessage = (event) => {
         event.preventDefault();
 
         if(message){
-            socket.emit('sendMessage', {message, userType, internID, companyID, name, room}, () => setMessage(''));
+            socket.emit('sendMessage', {message, userType, internID, companyID, name, room, sendTimestamp: new Date().toISOString()}, () => setMessage(''));
         }
     }
 
@@ -188,14 +197,18 @@ function ChatSection(props) {
 
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated}/>
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
         <SubHeader
             title = "Chat Section"
         />
         <div className = "container my-5">
             <div className = "row mt-5">
                 <div className = "col-12 col-md-4 col-lg-3 mx-auto">
-                    <CompanyProfileNavbar logout = {props.logout} />
+                    { userType === 'company' ?
+                        <CompanyProfileNavbar logout = {props.logout} />
+                        :
+                        <InternProfileNavbar logout = {props.logout} />
+                    }
                 </div>
                 <div className="col-12 col-md-8 col-lg-9 mx-auto">
                     <div className = "chat-section w-100 mt-4 mt-md-0">
@@ -222,7 +235,7 @@ function ChatSection(props) {
                                             {chatRooms && chatRooms.map((chatRoom, index) => {
                                                 return (
                                                     <li key = {index} className = "chat-list-item">
-                                                        <a href = {`/chat?companyID=${userType === 'company' ? chatRoom.company_ID : chatRoom.users[0].company_ID}&internID=${userType === 'intern' ? chatRoom.intern_ID : chatRoom.users[0].intern_ID}`} className = "chat-list-link">
+                                                        <a href = {`/chat/${userId}?companyID=${userType === 'company' ? chatRoom.company_ID : chatRoom.users[0].company_ID}&internID=${userType === 'intern' ? chatRoom.intern_ID : chatRoom.users[0].intern_ID}`} className = "chat-list-link">
                                                             <div className = "d-flex">
                                                                 <div className = "chat-avatar-img">
                                                                     <img 
@@ -364,7 +377,10 @@ function ChatSection(props) {
                                                                 <div className = "chat-time">
                                                                 {
                                                                     //Remove the seconds from the time
+                                                                    message.timestamp ?
                                                                     new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                                                    :
+                                                                    new Date(message.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                                                                 }</div>
                                                             </div>
                                                         </li>
@@ -386,7 +402,9 @@ function ChatSection(props) {
                                                                 <div className = "chat-time">
                                                                 {
                                                                     //Remove the seconds from the time
+                                                                    message.timestamp ?
                                                                     new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                                                                    : new Date(message.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                                                                 }</div>
                                                             </div>
                                                         </li>

@@ -41,7 +41,7 @@ function EducationWorkHistory(props) {
             if(educationEntries.length > 0){
                 for(let i = 0; i < educationEntries.length; i++){
                     if(!educationEntries[i].school_name || !educationEntries[i].department || !educationEntries[i].location || !educationEntries[i].degree || !educationEntries[i].start_date || !educationEntries[i].end_date){
-                        alert("Please fill all fields in the education section!");
+                        //alert("Please fill all fields in the education section!");
                         break;  //Exit the loop if any field is empty
                     }
                     const educationResponse = await axios.post(`http://localhost:5000/intern/${id}/education`, educationEntries);
@@ -55,7 +55,7 @@ function EducationWorkHistory(props) {
             if(workHistoryEntries.length > 0){
                 for(let i = 0; i < workHistoryEntries.length; i++){
                     if(!workHistoryEntries[i].company_name || !workHistoryEntries[i].location || !workHistoryEntries[i].position || !workHistoryEntries[i].description || !workHistoryEntries[i].start_date || !workHistoryEntries[i].end_date){
-                        alert("Please fill all fields in the work history section!");
+                        //alert("Please fill all fields in the work history section!");
                         break;
                     }
                     const workHistoryResponse = await axios.post(`http://localhost:5000/intern/${id}/work-history`, workHistoryEntries);
@@ -71,7 +71,7 @@ function EducationWorkHistory(props) {
 
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated} />
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
         <SubHeader 
             title = "Education and Work History"
             subtitle = "Add your education and work history here!"

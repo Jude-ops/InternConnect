@@ -9,7 +9,10 @@ import { useNavigate } from "react-router-dom";
 function PostInternship(props){
 
     const navigate = useNavigate();
-   
+    
+    const [description1Touched, setDescription1Touched] = useState(false);
+    const [description2Touched, setDescription2Touched] = useState(false);
+    const [description3Touched, setDescription3Touched] = useState(false);
     const [internshipInfo, setInternshipInfo] = useState({
         internshipTitle: "",
         category: "",
@@ -26,6 +29,17 @@ function PostInternship(props){
         skillsRequired: "",
     });
 
+    function handleDescriptionBlur(event){
+        const {name} = event.target;
+        if(name === "internshipDescription"){
+            setDescription1Touched(true);
+        } else if(name === "skillsRequired"){
+            setDescription2Touched(true);
+        } else if(name === "whoCanApply"){
+            setDescription3Touched(true);
+        }
+    }
+
     function handleChange(name, value){
 
         setInternshipInfo(prevValue => {
@@ -39,6 +53,13 @@ function PostInternship(props){
 
     async function postInternship(event){
         event.preventDefault();
+
+        const form = event.target.closest("form");
+        if(!form.checkValidity()){
+            form.reportValidity();
+            return;
+        }
+
         try{
             const response = await axios.post("http://localhost:5000/internships", internshipInfo);
             if(response){
@@ -51,7 +72,7 @@ function PostInternship(props){
 
     return(
         <div>
-            <Header isAuthenticated = {props.isAuthenticated} />
+            <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
             <SubHeader
                 title = "Post New Internship"
                 subtitle = "Add A New Internship to Our Platform!🚀"
@@ -60,7 +81,7 @@ function PostInternship(props){
             <div className = "container my-5 p-3">
                 <div className = "row">
                     <div className = "col-12 col-md-10 mx-auto">
-                        <h1 className = "text-center fw-bold">Add Internship Portal</h1>
+                        <h1 className = "text-center fw-bold" style = {{color: "#2980B9"}}>Add Internship Portal</h1>
                         <form className = "mt-3 registration-form">
 
                             <FormElement 
@@ -72,11 +93,13 @@ function PostInternship(props){
                                 labelTitle = "Internship Title"
                                 onChange = {handleChange}
                                 value = {internshipInfo.internshipTitle}
+                                errorMessage = "Input field should not be empty"
                             />
 
                             <div class="mb-4 mt-4">
                                 <label for="internshipDescription" class="form-label fw-bold">About Internship</label>
                                 <textarea 
+                                    required
                                     className="form-control" 
                                     id="internshipDescription" 
                                     rows="6" 
@@ -85,7 +108,10 @@ function PostInternship(props){
                                     onChange={(event) => {
                                         handleChange(event.target.name, event.target.value)
                                     }}
+                                    onBlur = {handleDescriptionBlur}
+                                    isTouched = {description1Touched ? "true" : "false"}
                                 ></textarea>
+                                <p className = "reg-error-message">Input field should not be empty!</p>
                             </div>
                             
                             <div className = "row mb-3">         
@@ -100,6 +126,7 @@ function PostInternship(props){
                                         labelTitle = "Category"
                                         onChange = {handleChange}
                                         value = {internshipInfo.category}
+                                        errorMessage = "Input field should not be empty"
                                     />
                                 </div>
 
@@ -113,6 +140,7 @@ function PostInternship(props){
                                         labelTitle = "Internship Location"
                                         onChange = {handleChange}
                                         value = {internshipInfo.internshipLocation}
+                                        errorMessage = "Input field should not be empty"
                                     />
                                 </div>
 
@@ -129,6 +157,7 @@ function PostInternship(props){
                                     labelTitle = "Internship Start Date"
                                     onChange = {handleChange}
                                     value = {internshipInfo.internshipStartDate}
+                                    errorMessage = "Input field should not be empty"
                                 />
                             </div>
 
@@ -142,6 +171,7 @@ function PostInternship(props){
                                     labelTitle = "Internship End Date"
                                     onChange = {handleChange}
                                     value = {internshipInfo.internshipEndDate}
+                                    errorMessage = "Input field should not be empty"
                                 />
                             </div>    
                         </div>
@@ -157,6 +187,7 @@ function PostInternship(props){
                                     labelTitle = "Application Deadline Date"
                                     onChange = {handleChange}
                                     value = {internshipInfo.applyBy}
+                                    errorMessage = "Input field should not be empty"
                                 />
                             </div>
 
@@ -170,6 +201,7 @@ function PostInternship(props){
                                     labelTitle = "No. of available positions"
                                     onChange = {handleChange}
                                     value = {internshipInfo.availablePositions}
+                                    errorMessage = "Input field should not be empty"
                                 />
                             </div>
                         </div>
@@ -177,6 +209,7 @@ function PostInternship(props){
                             <div className="mb-4 mt-4">
                                 <label for="skillsRequired" class="form-label fw-bold">Skill(s) Required</label>
                                 <textarea
+                                    required
                                     className="form-control" 
                                     id="skillsRequired" 
                                     rows="4" 
@@ -185,7 +218,10 @@ function PostInternship(props){
                                     onChange={(event) => {
                                         handleChange(event.target.name, event.target.value)
                                     }}
-                                ></textarea> 
+                                    onBlur = {handleDescriptionBlur}
+                                    isTouched = {description2Touched ? "true" : "false"}
+                                ></textarea>
+                                <p className = "reg-error-message">Input field should not be empty!</p> 
                             </div>
 
                         <FormElement 
@@ -197,11 +233,13 @@ function PostInternship(props){
                                 labelTitle = "Perks of Internship"
                                 onChange = {handleChange}
                                 value = {internshipInfo.perksOfInternship}
+                                errorMessage = "Input field should not be empty"
                         />
 
                             <div className="mb-4 mt-4">
                                 <label for="whoCanApply" class="form-label fw-bold">Who Can Apply</label>
                                 <textarea 
+                                    required
                                     className="form-control" 
                                     id="whoCanApply" 
                                     rows="6" 
@@ -210,7 +248,10 @@ function PostInternship(props){
                                     onChange={(event) => {
                                         handleChange(event.target.name, event.target.value)
                                     }}
+                                    onBlur = {handleDescriptionBlur}
+                                    isTouched = {description3Touched ? "true" : "false"}
                                 ></textarea>
+                                <p className = "reg-error-message">Input field should not be empty!</p>
                             </div>
 
                             <FormElement 
@@ -222,6 +263,7 @@ function PostInternship(props){
                                 labelTitle = "Company Name"
                                 onChange = {handleChange}
                                 value = {internshipInfo.companyName}
+                                errorMessage = "Input field should not be empty"
                             />
 
                             <div className = "text-center mt-4">

@@ -90,7 +90,7 @@ function EditInternship(props) {
 
   return (
     <div>
-      <Header isAuthenticated = {props.isAuthenticated}/>
+      <Header isAuthenticated = {props.isAuthenticated} logout ={props.logout} />
       <SubHeader
         title = {internshipData && internshipData.internshipName}
         subtitle = "Make changes to your internship listing"

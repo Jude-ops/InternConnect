@@ -79,7 +79,7 @@ function Header(props){
                         <ul className="navbar-nav me-auto col-12 col-lg-auto me-lg-auto mb-2 ms-5 justify-content-center mb-md-0">
                             <li className = "nav-item mx-3"><a href = "/" className="nav-link px-2 text-secondary" id = "header-link">Home</a></li>
                             <li className = "nav-item mx-3"><a href = "/internships" className="nav-link px-2 text-secondary" id = "header-link">Internships</a></li>
-                            <li className = "nav-item mx-3"><a href = "/about" className="nav-link px-2 text-secondary" id = "header-link">About</a></li>
+                            <li className = "nav-item mx-3"><a href = "/about_us" className="nav-link px-2 text-secondary" id = "header-link">About</a></li>
                         </ul>
 
                         {
@@ -165,7 +165,7 @@ function Header(props){
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item" href="/login" onClick={props.logout}>
+                                            <a class="dropdown-item" href="/" onClick={props.logout}>
                                                 <i class="bi bi-box-arrow-right me-2"></i>
                                                 Logout
                                             </a>

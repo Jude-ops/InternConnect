@@ -53,7 +53,7 @@ function MyApplications(props) {
 
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated} />
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
         <SubHeader 
             title = "My Applications"
             subtitle = "View all your applications here"

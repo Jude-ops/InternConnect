@@ -27,7 +27,7 @@ function InternshipApplications(props) {
 
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated}/>
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
         <SubHeader 
             title = {internshipApplications.length > 0 && internshipApplications[0].internship_name}
             subtitle = "View all applications for this internship here"

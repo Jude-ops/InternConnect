@@ -37,22 +37,29 @@ function SavedInternships(props) {
         }
     }
 
+    function truncateDescription(description){
+        //If description is more than 50 word, truncate it
+        if(description.split(" ").length > 50){
+            return description.split(" ").splice(0,50).join(" ") + "...";
+        }
+        return description;
+    }
+
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated} />
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
         <SubHeader 
             title = "Saved Internships"
             subtitle = "View all your saved internships here"
         />
         <div className="container my-5">
-            <h1 className="heading text-center fw-bold">Saved Internships</h1>
             <div className = "row mt-5">
                 <div className = "col-12 col-md-4">
                     <InternProfileNavbar logout = {props.logout} />
                 </div>
-                <div className = "col-12 col-md-8">
+                <div className = "col-12 col-md-8 mt-md-0 mt-4">
                     <h3 className = "fw-bold">Saved Internships</h3>
-                    <div className = "row mt-4 row-cols-1 row-cols-md-2 g-4">
+                    <div className = "row mt-2 row-cols-1 row-cols-md-2 g-4">
                         {savedInternships.map((internship, index) => {
                             return (
                                 <div className = "col">
@@ -105,15 +112,25 @@ function SavedInternships(props) {
                                                                     const datePosted = new Date(internship.posted_On);
                                                                     const dateToday = new Date();
                                                                     const daysSincePosted = Math.floor((dateToday - datePosted) / (1000 * 60 * 60 * 24));
-                                                                    return `Posted ${daysSincePosted} days ago`;
+                                                                    const weeksSincePosted = Math.floor(daysSincePosted / 7);
+                                                                    const monthsSincePosted = Math.floor(daysSincePosted / 30);
+
+                                                                    if (monthsSincePosted > 0) {
+                                                                        return `Posted ${monthsSincePosted} month${monthsSincePosted > 1 ? 's' : ''} ago`;
+                                                                    } else if (weeksSincePosted > 0) {
+                                                                        return `Posted ${weeksSincePosted} week${weeksSincePosted > 1 ? 's' : ''} ago`;
+                                                                    } else {
+                                                                        return `Posted ${daysSincePosted} day${daysSincePosted > 1 ? 's' : ''} ago`;
+                                                                    }
                                                                 
                                                                 })()
                                                             }
                                                         </small>
                                                     </span>  
                                                 </div>
-                                                <p className="card-text text-wrap">{internship.internship_description}</p>
-                                                <div className = "d-flex mb-4">
+                                                
+                                                <p className="card-text text-wrap">{truncateDescription(internship.internship_description)}</p>
+                                                <div className = "d-flex mb-4 flex-wrap">
                                                     {
                                                         (() => {
                                                             const skills = internship.skills_required.split(/[\n,]+/);

@@ -9,9 +9,12 @@ import { Link, useParams } from 'react-router-dom';
 function ShortlistedInterns(props) {
 
     const [shortlistedInterns, setShortlistedInterns] = useState([]);
+    const [userId, setUserId] = useState(null);
     const {companyID} = useParams();
 
-    useEffect(() => {          
+    useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        setUserId(userId);          
         async function fetchShortlistedInterns(){
             try {
                 const response = await axios.get(`http://localhost:5000/company/${companyID}/shortlist`);
@@ -37,7 +40,7 @@ function ShortlistedInterns(props) {
 
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated}/>
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
         <SubHeader 
             title = {shortlistedInterns.length > 0 && shortlistedInterns[0].company_name}
             subtitle = "View all your shortlisted interns here"
@@ -77,7 +80,7 @@ function ShortlistedInterns(props) {
                                                     </div>
                                                 </div>
                                                 <div className = "d-flex justify-content-between">
-                                                    <Link to = {`/chat?companyID=${companyID}&internID=${intern.intern_ID}`} className="btn btn-primary btn-sm">
+                                                    <Link to = {`/chat/${userId}?companyID=${companyID}&internID=${intern.intern_ID}`} className="btn btn-primary btn-sm">
                                                         <i className="bi bi-chat-dots me-2"></i>
                                                         Message
                                                     </Link>

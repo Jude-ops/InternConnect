@@ -156,7 +156,7 @@ function VideoChat(props) {
 
   return (
     <div>
-        <Header isAuthenticated = {props.isAuthenticated} />
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
         <div className = "container my-5">
             <div className = "row mt-5">
                 <div className = "col-12">

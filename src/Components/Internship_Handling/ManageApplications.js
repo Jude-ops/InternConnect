@@ -42,7 +42,7 @@ function ManageApplications(props) {
 
   return (
     <div>
-      <Header isAuthenticated = {props.isAuthenticated}/>
+      <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
       <SubHeader
         title = "Manage Applications"
         subtitle = "Manage applications for your posted internships"

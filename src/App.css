@@ -383,7 +383,7 @@ input:focus, select:focus, textarea:focus{
     color: #2980B9;
 }
 
-.hire-me-section button, .public-profile-overview button, .internship-details button{
+.hire-me-section button, .public-profile-overview button, .internship-details button, .about-us-button button{
     padding: 13px 33px;
     background-color: #2980B9 !important;
     border: 1px solid #2980B9 !important;
@@ -406,7 +406,7 @@ input:focus, select:focus, textarea:focus{
     color: white !important;
 }
 
-.hire-me-section button:hover, .public-profile-overview button:hover, .internship-details button:hover{
+.hire-me-section button:hover, .public-profile-overview button:hover, .internship-details button:hover, .about-us-button button:hover{
     background-color: #265c80 !important;
     border: 1px solid #265c80 !important;
     bottom: 5px;
@@ -703,4 +703,15 @@ textarea:invalid[isTouched = "true"] ~ p.reg-error-message{
 #keywordSearchButton:hover{
     background-color: #2980B9;
     color: white;
+}
+
+.active-profile-link{
+    color: #2980B9 !important;
+    background-color: #F8F9FA !important;
+}
+
+#internship-illustration-image{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }

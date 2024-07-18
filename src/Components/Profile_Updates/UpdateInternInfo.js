@@ -12,6 +12,7 @@ function UpdateInternInfo(props){
     const navigate = useNavigate();
     const {id} = useParams();
 
+    const [showPassword, setShowPassword] = useState(false);
     const [image, setImage] = useState(null); //Image file to be uploaded
     const [selectedFile, setSelectedFile] = useState(null); //Image file to be sent to the server
     const [educationHistory, setEducationHistory] = useState([]);
@@ -117,6 +118,10 @@ function UpdateInternInfo(props){
 
     };
 
+    function toggleShowPassword(){
+        setShowPassword(!showPassword);
+    }
+
     function handleEducationChange(index, name, value){ 
         const values = [...educationHistory];
         values[index][name] = value;
@@ -148,6 +153,12 @@ function UpdateInternInfo(props){
 
     async function handleSubmit(event){
         event.preventDefault();
+
+        const form = event.target.closest("form");
+        if(!form.checkValidity()){
+            form.reportValidity();
+            return;
+        }
 
         try{
 
@@ -188,6 +199,12 @@ function UpdateInternInfo(props){
 
             if(response){
                 navigate("/");
+            } else {
+                const errorMessage = document.querySelector(".login-error-message");
+                errorMessage.classList.remove("hidden");
+                setTimeout(() => {
+                    errorMessage.classList.add("hidden");
+                }, 3000);
             }
 
         } catch (error) {
@@ -248,7 +265,7 @@ function UpdateInternInfo(props){
 
     return (
         <div>
-            <Header isAuthenticated = {props.isAuthenticated} />
+            <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
             <SubHeader 
                 title = "Update Intern Info"
                 subtitle = "Update your credentials to get the best out of your internship experience!"
@@ -604,34 +621,50 @@ function UpdateInternInfo(props){
                             <hr className = "line-divider" />
 
                             <h6 className = "text-muted h6-responsive">
-                                If you don't wish to change your password, enter your old password in the password field and leave the confirm password field empty.
+                                If you don't wish to change your password, enter your old password in the password and confirm password fields.
                             </h6>
 
                             <div className = "row mb-3">
                                 <div className = "col-12 col-sm-5">  
                                     <FormElement 
                                         labelFor = "password" 
-                                        type = "password" 
+                                        type = {showPassword ? "text" : "password"} 
                                         id = "password" 
                                         name = "password" 
                                         labelTitle = "Password"
                                         onChange = {handleChange}
                                         value = {internInfo.password}
+                                        pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@!#%*?&])[A-Za-z\d@!#%*?&]{8,}$" 
+                                        errorMessage = {internInfo.password === "" ? "Input field should not be empty!" : "Password should be minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character!"}
                                     />
                                 </div>
 
                                 <div className = "col-12 col-sm-5">
                                     <FormElement 
                                         labelFor = "confirmPassword" 
-                                        type = "password" 
+                                        type = {showPassword ? "text" : "password"} 
                                         id = "confirmPassword" 
                                         name = "confirmPassword" 
                                         labelTitle = "Confirm Password"
                                         onChange = {handleChange}
                                         value = {internInfo.confirmPassword}
+                                        pattern = {internInfo.password}
+                                        errorMessage = {internInfo.confirmPassword === "" ? "Input field should not be empty" : "Passwords do not match!"}
                                     />
                                 </div>
+                                <div className = "col-12 mb-3">
+                                    <input 
+                                        type = "checkbox"
+                                        id = "showPassword"
+                                        checked = {showPassword}
+                                        onChange = {toggleShowPassword}
+                                        className = "form-check-input me-2"
+                                    />
+                                    <label htmlFor="showPassword" className = "form-check-label fw-bold">Show Password</label>
+                                </div>
                             </div>
+
+                            <p className = "login-error-message hidden">Error updating intern info. Please try again</p>
       
                             <div id = "submitButton" className = "mt-5">
                                 <button type = "submit" className ="btn btn-primary" onClick = {handleSubmit}>Update</button>

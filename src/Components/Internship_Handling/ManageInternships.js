@@ -59,7 +59,7 @@ function ManageInternships(props) {
   return (
     
     <div>
-        <Header isAuthenticated = {props.isAuthenticated}/>
+        <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
         <SubHeader 
             title = "Manage Your Internships"
             subtitle = "View and manage your posted internships"

@@ -50,8 +50,11 @@ function SubHeader(props) {
 
                                 {
                                     filteredPathnames.map((name, index) => {
+                                        //Remove underscores and capitalize the first letter of each word
+                                        const nameWithoutUnderscores = name.replace(/_/g, " ");
+                                        //Captitalize the first letter of each word
+                                        const valueCapitalized = nameWithoutUnderscores.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
                                         const routeTo = `/${pathnames.slice(0, index + 1).join("/")}`;
-                                        const valueCapitalized = name.charAt(0).toUpperCase() + name.slice(1);
                                         const isLast = index === pathnames.length - 1;
                                         return isLast ? (
                                             <li className = "breadcrumb-item active link-breadcrumb" aria-current = "page" key = {index}>

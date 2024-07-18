@@ -22,6 +22,7 @@ import ShortlistedInterns from "./Components/Company_Profile/ShortlistedInterns"
 import InternshipApplications from "./Components/Company_Profile/InternshipApplications";
 import ChatSection from "./Components/Homepage/ChatSection";
 import VideoChat from "./Components/Communication/VideoChat";
+import About from "./Components/Homepage/About";
 
  function App() {
 
@@ -100,8 +101,8 @@ const logout = () => {
           <Route path = "/register/intern" element = {<RegistrationIntern isAuthenticated = {user} setToken = {setToken}  setUserType = {setUserType} setInternID = {setInternID} setUserId = {setUserId} setFirstName = {setFirstName}/>} />
           <Route path = "/login" element = {user() ? <Navigate to = "/" /> : <LoginPage setToken = {setToken} isAuthenticated = {user} setUserType = {setUserType} setCompanyID = {setCompanyID} setInternID = {setInternID} setUserId = {setUserId} setFirstName = {setFirstName}/>} />
           <Route path = "/register/company" element = {<RegistrationCompany isAuthenticated = {user} setToken = {setToken} setUserType = {setUserType} setCompanyID = {setCompanyID} setUserId = {setUserId} setFirstName={setFirstName}/>} />
-          <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} />} />
-          <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} />} />
+          <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} logout = {logout}/>} />
+          <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/post_internship" element = { user() && <PostInternship isAuthenticated = {user}/>} />
           <Route path = "/internship/:id" element = {<InternshipDetails isAuthenticated = {user}/>} />
           <Route path = "/company/:id/internships" element = {<ManageInternships isAuthenticated = {user} />} />
@@ -115,8 +116,9 @@ const logout = () => {
           <Route path = "/company/:id/public_profile" element = {<CompanyPublicProfile isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/company/:companyID/saved_interns" element = {<ShortlistedInterns isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/company/:id/internship/:internshipID/applications" element = {<InternshipApplications isAuthenticated = {user} logout = {logout} />} />
-          <Route path = "/chat" element = {<ChatSection isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/chat/:userId" element = {<ChatSection isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/video_chat" element = {<VideoChat isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/about_us" element = {<About isAuthenticated = {user} logout = {logout} />} />
         </Routes>
       </BrowserRouter>
     </div>

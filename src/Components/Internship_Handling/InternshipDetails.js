@@ -118,7 +118,7 @@ function InternshipDetails(props) {
 
     return (
         <div>
-            <Header isAuthenticated = {props.isAuthenticated}/>
+            <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
             <SubHeader 
                 title = {internshipDetails && internshipDetails[0].internship_name}
                 subtitle = {internshipDetails && internshipDetails[0].company_Name}

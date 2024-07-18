@@ -154,7 +154,7 @@ io.on("connection", async (socket) => {
     });
 
     //Listen for the "message" event from the client
-    socket.on("sendMessage", ({message, userType, companyID, internID, name, room}, callback) => {
+    socket.on("sendMessage", ({message, userType, companyID, internID, name, room, sendTimestamp}, callback) => {
         console.log(`Message from ${name} in room ${room} received: ${message}`);
 
         //Check if the message is empty
@@ -181,7 +181,7 @@ io.on("connection", async (socket) => {
             console.log("Message stored in database!");
         });
 
-        io.to(room).emit("message", {user: name, content: message});
+        io.to(room).emit("message", {user: name, content: message, time: sendTimestamp});
         //Emit an event for a new message notification
         io.to(room).emit("newMessageNotification", {user: name, content: message});
         callback();

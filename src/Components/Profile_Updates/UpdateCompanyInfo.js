@@ -144,12 +144,12 @@ function UpdateCompanyInfo(props){
 
     return (
         <div>
-            <Header isAuthenticated = {props.isAuthenticated}/>
+            <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout}/>
             <SubHeader 
                 title = "Update Company Info"
                 subtitle = "Update your company credentials"
             />
-            <div className = "container my-5 mx-auto p-3">
+            <div className = "container my-3 mx-auto p-3">
                 <div className = "row mt-4">
                     <div className = "col-12 col-md-4">
                         <CompanyProfileNavbar logout = {props.logout}/>
@@ -337,9 +337,8 @@ function UpdateCompanyInfo(props){
                             </div>
 
                         </form>
-                    </div>
-
-                    <div className = "col-12 text-center mt-5">
+                        
+                        <div className = "col-12 text-center mt-5">
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         Delete Account
                         </button>
@@ -364,6 +363,7 @@ function UpdateCompanyInfo(props){
                         </div>
                     </div>
 
+                    </div>
                 </div>
             </div>
             <Footer />
