@@ -95,7 +95,7 @@ function MyApplications(props) {
                                             </div>
                                         </td>
                                         <td>{internshipDetails[index] && internshipDetails[index][0].company_Name}</td>
-                                        <td>{application.application_status}</td>
+                                        <td style = {{color: application.application_status === "Rejected" ? "red" : application.application_status === "Accepted" ? "green" : "black"}}>{application.application_status}</td>
                                         <td>{new Date(application.date_applied).toDateString()}</td>
                                     </tr>
                                 ))}

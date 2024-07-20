@@ -40,6 +40,44 @@ function ManageApplications(props) {
     }
   }
 
+  async function acceptIntern(internID, internshipID) {
+    try {
+      const response = await axios.patch(`http://localhost:5000/company/${id}/accept`, {
+        internID: internID,
+        internshipID: internshipID
+      });
+      if(response) {
+        const successMessage = document.querySelector('.accept-message');
+        successMessage.classList.remove('hidden');
+        setTimeout(() => {
+          successMessage.classList.add('hidden');
+          window.location.reload();
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error accepting intern: ", error);
+    }
+  }
+
+  async function rejectIntern(internID, internshipID) {
+    try {
+      const response = await axios.patch(`http://localhost:5000/company/${id}/reject`, {
+        internID: internID,
+        internshipID: internshipID
+      });
+      if(response) {
+        const successMessage = document.querySelector('.reject-message');
+        successMessage.classList.remove('hidden');
+        setTimeout(() => {
+          successMessage.classList.add('hidden');
+          window.location.reload();
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error accepting intern: ", error);
+    }
+  }
+
   return (
     <div>
       <Header isAuthenticated = {props.isAuthenticated} logout = {props.logout} />
@@ -61,6 +99,8 @@ function ManageApplications(props) {
                   <h4 className = "h4 fw-bold">
                     You've received {applications && applications.length} application{applications && (applications.length > 1 || applications.length === 0 ? ('s') : (''))}
                   </h4>
+                  <p className = "login-success-message hidden accept-message">Intern has been accepted into your internship program!</p>
+                  <p className = "login-success-message hidden reject-message">Intern has been rejected from your internship program!</p>
                 </div>
               </div>
 
@@ -95,6 +135,18 @@ function ManageApplications(props) {
                                 className = "bi bi-heart ms-2" 
                                 style = {{color:"#2980B9"}}>
                               </i>
+                              <i
+                                role = "button"
+                                className = "bi bi-hand-thumbs-up ms-2"
+                                style = {{color:"green"}}
+                                onClick = {() => acceptIntern(application.intern_ID, application.internship_ID)}
+                              ></i>
+                              <i
+                                role = "button"
+                                className = "bi bi-hand-thumbs-down ms-2"
+                                style = {{color:"red"}}
+                                onClick = {() => rejectIntern(application.intern_ID, application.internship_ID)}
+                              ></i>
                             </td>
                             <td className = "small">
                               <a href = {`http://localhost:5000/document/${application.intern_ID}`} className = "btn" role = "button" style = {{color:"#2980B9", textDecoration:"underline"}}>Download</a>

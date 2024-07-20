@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import Header from '../Homepage/Header';
 import Footer from '../Homepage/Footer';
-import { useParams} from 'react-router-dom';
+import { useParams, Link} from 'react-router-dom';
 import axios from 'axios';
 
 function PublicProfile(props) {
@@ -11,6 +11,27 @@ function PublicProfile(props) {
     const [educationInfo, setEducationInfo] = useState(null);
     const [experienceInfo, setExperienceInfo] = useState(null);
     const [profileImage, setProfileImage] = useState(null);
+    const [companyID, setCompanyID] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [userType, setUserType] = useState("");
+    
+    useEffect(() => {
+        const storedCompanyID = localStorage.getItem('companyID');
+        if(storedCompanyID){
+            setCompanyID(storedCompanyID);
+        }
+
+        const storedUserType = localStorage.getItem('userType');
+        if(storedUserType){
+            setUserType(storedUserType);
+        }
+
+        const storedUserId = localStorage.getItem('userId');
+        if(storedUserId){
+            setUserId(storedUserId);
+        }
+
+    }, []);
 
     useEffect(() => {
 
@@ -60,6 +81,19 @@ function PublicProfile(props) {
         fetchExperienceInfo();
     
     }, [id]);
+
+    async function shortListIntern(internID) {
+        try {
+            const response = await axios.post(`http://localhost:5000/company/${companyID}/shortlist`, {
+                internID: internID
+            });
+            if(response) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error("Error shortlisting intern: ", error);
+        }
+    }
 
   return (
     <div>
@@ -224,11 +258,12 @@ function PublicProfile(props) {
                                     </div>
                                 </div>
                                 <hr className = "line-divider my-4"/>
-
-                                <div className = "hire-me-section">
-                                    <button className = "btn btn-primary">Hire Now</button>
-                                    <button id = "save-profile-button" className = "btn btn-primary ms-3">Save Profile</button>
-                                </div>
+                                
+                                {userType === 'company' &&
+                                    <div className = "hire-me-section">
+                                        <button id = "save-profile-button" className = "btn btn-primary ms-3" onClick={() => shortListIntern(profileInfo[0].intern_ID)}>Save Profile</button>
+                                    </div>
+                                }
                             </div>
                             
                         </div>
@@ -294,10 +329,12 @@ function PublicProfile(props) {
                                 </div>
 
                                 <hr className = "line-divider my-4"/>
-
-                                <div className = "contact-me">
-                                    <button className = "btn">Contact Me</button>
-                                </div>
+                                
+                                {userType === 'company' &&
+                                    <div className = "contact-me">
+                                        <Link to = {`/chat/${userId}?companyID=${companyID}&internID=${id}`} className = "btn" id = "contact-me-button">Contact Me</Link>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

@@ -179,7 +179,7 @@ function InternshipsListing(props) {
             subtitle = "Find the best internships that suit your career goals"
         />
 
-      <div className="container my-5" style = {{width: "75%"}}>
+      <div className="container my-5" id = "internship-listings-container" style = {{width: "75%"}}>
         <div className="row mt-5">
           <div className="col-12">
             <h3 className="h3 fw-bold">{internships.length} Total Internships Available</h3>
@@ -191,7 +191,7 @@ function InternshipsListing(props) {
         </div>
 
         <div className="row mt-4">
-            <div className="col-12 col-md-4" style = {{position: "sticky", top: "30px", height: "100%"}}>
+            <div className="col-12 col-md-4" id = "filter-list" style = {{position: "sticky", top: "30px", height: "100%"}}>
                 <div className = "internship-overview internship-filters w-100">
                     <div className = "filter-section">
                         <h4 style = {{color: "#2980B9"}}>Filters</h4>
@@ -405,7 +405,7 @@ function InternshipsListing(props) {
                                     </div>
                                 </div>
                                 
-                                <div className = "d-flex justify-content-between align-items-center">
+                                <div className = "d-flex justify-content-between align-items-center" id = "internship-little-details">
                                     <span className="card-text">
                                         <small className = "text-muted">
                                         <i className="bi bi-geo-alt-fill me-2"></i>
@@ -475,7 +475,7 @@ function InternshipsListing(props) {
                                     </span>
                                 </div>
 
-                                <div className = "d-flex justify-content-end mt-4">
+                                <div className = "d-flex justify-content-end mt-4" id = "internship-listing-buttons">
                                     <div><i className = "bi bi-heart h3 me-4 save-internship-icon" onClick={() =>{saveInternship(internship.internship_ID)}}></i></div>
                                     <button className="btn btn-primary btn-sm" onClick={()=> {handleClick(internship.internship_ID)}}>View Details</button>
                                 </div>

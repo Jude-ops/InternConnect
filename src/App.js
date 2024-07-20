@@ -104,11 +104,11 @@ const logout = () => {
           <Route path = "/update/intern/:id" element = {<UpdateInternInfo isAuthenticated = {user} logout = {logout}/>} />
           <Route path = "/update/company/:id" element = {<UpdateCompanyInfo isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/post_internship" element = { user() && <PostInternship isAuthenticated = {user}/>} />
-          <Route path = "/internship/:id" element = {<InternshipDetails isAuthenticated = {user}/>} />
-          <Route path = "/company/:id/internships" element = {<ManageInternships isAuthenticated = {user} />} />
-          <Route path = "/company/:id/received_applications" element = {<ManageApplications isAuthenticated = {user} />} /> 
-          <Route path = "/company/:companyID/internship/:id/edit" element = {<EditInternship isAuthenticated = {user} />} />
-          <Route path = "/internships" element = {<InternshipsListing isAuthenticated = {user} />} />
+          <Route path = "/internship/:id" element = {<InternshipDetails isAuthenticated = {user} logout = {logout}/>} />
+          <Route path = "/company/:id/internships" element = {<ManageInternships isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/company/:id/received_applications" element = {<ManageApplications isAuthenticated = {user} logout = {logout} />} /> 
+          <Route path = "/company/:companyID/internship/:id/edit" element = {<EditInternship isAuthenticated = {user} logout = {logout} />} />
+          <Route path = "/internships" element = {<InternshipsListing isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/intern/:id/applications" element = {<MyApplications isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/intern/:id/saved_internships" element = {<SavedInternships isAuthenticated = {user} logout = {logout} />} />
           <Route path = "/intern/:id/public_profile" element = {<PublicProfile isAuthenticated = {user} logout = {logout} />} />

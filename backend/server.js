@@ -935,6 +935,36 @@ app.get("/company/:id/applications", (req,res) => {
     });
 });
 
+//Accept an intern application
+app.patch("/company/:id/accept", (req,res) => {
+    const companyID = req.params.id;
+    const {internID, internshipID} = req.body;
+
+    db.query('UPDATE applications SET application_status = "Accepted" WHERE company_ID = ? AND intern_ID = ? AND internship_ID = ?', [companyID, internID, internshipID], (err, result) => {
+        if(err){
+            console.log("Error updating the data in the database!", err);
+            return;
+        }
+        console.log("Application data updated successfully!", result);
+        res.send({message: "Application data updated successfully!"});
+    });
+});
+
+//Reject an intern application
+app.patch("/company/:id/reject", (req,res) => {
+    const companyID = req.params.id;
+    const {internID, internshipID} = req.body;
+
+    db.query('UPDATE applications SET application_status = "Rejected" WHERE company_ID = ? AND intern_ID = ? AND internship_ID = ?', [companyID, internID, internshipID], (err, result) => {
+        if(err){
+            console.log("Error updating the data in the database!", err);
+            return;
+        }
+        console.log("Application data updated successfully!", result);
+        res.send({message: "Application data updated successfully!"});
+    });
+});
+
 //Get applications for a specific internship
 app.get("/internship/:internshipID/applications", (req,res) => {
     const id = req.params.internshipID;
@@ -1175,13 +1205,18 @@ app.get("/intern/info/:internID", (req,res) => {
 });
 
 //Route for applying to an internship
-app.post('/internship/:id/apply', upload.single('resume'), (req, res) => {
+app.post('/internship/:id/apply', upload.any(), (req, res) => {
+
+    if(req.files.length === 0){
+        return res.status(400).send('Please upload a file!');
+    }
 
     // Save file metadata to the database
-    const filename = req.file.originalname;
-    const resume = req.file.path;
-    const fileType = req.file.mimetype;
-    const fileSize = req.file.size;
+    const file = req.files[0];
+    const filename = file.originalname;
+    const fileType = file.mimetype;
+    const fileSize = file.size;
+    const resume = file.path;
 
     const id = req.params.id;
 
@@ -1221,7 +1256,6 @@ app.post('/internship/:id/apply', upload.single('resume'), (req, res) => {
     db.query(sql, [filename, fileType, fileSize, resume, internID ], (err, result) => {
         if (err) throw err;
         console.log('File uploaded to the database', result);
-        res.send('File uploaded successfully');
     });
 });
 

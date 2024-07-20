@@ -169,6 +169,20 @@ textarea:focus{
     }
 }
 
+@media screen and (max-width: 768px){
+    #filter-list, #internship-little-details{
+        display: none !important;
+    }
+
+    #internship-listings-container{
+        width: 100% !important;
+    }
+
+    #internship-listing-buttons{
+        justify-content: space-between !important;
+    }
+}
+
 .modal-header{
     background-color: #2980B9;
     color: white;
@@ -383,7 +397,7 @@ input:focus, select:focus, textarea:focus{
     color: #2980B9;
 }
 
-.hire-me-section button, .public-profile-overview button, .internship-details button, .about-us-button button{
+.hire-me-section button, .internship-details button, .about-us-button button, #contact-me-button{
     padding: 13px 33px;
     background-color: #2980B9 !important;
     border: 1px solid #2980B9 !important;
@@ -406,7 +420,7 @@ input:focus, select:focus, textarea:focus{
     color: white !important;
 }
 
-.hire-me-section button:hover, .public-profile-overview button:hover, .internship-details button:hover, .about-us-button button:hover{
+.hire-me-section button:hover, .internship-details button:hover, .about-us-button button:hover, #contact-me-button:hover{
     background-color: #265c80 !important;
     border: 1px solid #265c80 !important;
     bottom: 5px;

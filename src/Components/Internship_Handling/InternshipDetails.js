@@ -54,15 +54,18 @@ function InternshipDetails(props) {
         try {
 
             const formData = new FormData();
-            const resume = fileInput.current.files[0];
+            const resume = fileInput && fileInput.current.files[0];
+            console.log(resume);
 
             formData.append("resume", resume);
             formData.append("companyID", internshipDetails[0].company_ID);
+            formData.append("internID", internID);
             
             for (let key in application) {
                 formData.append(key, application[key]);
             }
 
+            
             const response = await axios.post(`http://localhost:5000/internship/${id}/apply`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -70,9 +73,19 @@ function InternshipDetails(props) {
             });
 
             if (response) {
+                const successMessage = document.querySelector('.accept-message');
+                successMessage.classList.remove('hidden');
+                setTimeout(() => {
+                successMessage.classList.add('hidden');
                 window.location.reload();
+                }, 1000);
+            } else{
+                const errorMessage = document.querySelector('.reject-message');
+                errorMessage.classList.remove('hidden');
+                setTimeout(() => {
+                    errorMessage.classList.add('hidden');
+                }, 1000);
             }
-
         } catch (error) {
             console.log('Error submitting application:', error);
         }
@@ -287,70 +300,71 @@ function InternshipDetails(props) {
                                                     <button id = "modal-close-button" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                <form>
-                                                    <FormElement 
-                                                        labelFor = "fullName"
-                                                        labelTitle = "Full Name"
-                                                        type = "text"
-                                                        id = "fullName"
-                                                        placeholder = "Full Name"
-                                                        name = "fullName"
-                                                        value = {application.fullName}
-                                                        onChange = {handleChange}
-                                                    />
-
-                                                    <FormElement 
-                                                        labelFor = "email"
-                                                        labelTitle = "Email"
-                                                        type = "email"
-                                                        id = "email"
-                                                        placeholder = "Email"
-                                                        name = "email"
-                                                        value = {application.email}
-                                                        onChange = {handleChange}
-                                                    />
-
-                                                    <FormElement
-                                                        labelFor = "phone"
-                                                        labelTitle = "Phone"
-                                                        type = "tel"
-                                                        id = "phone"
-                                                        placeholder = "Phone"
-                                                        name = "phone"
-                                                        value = {application.phone}
-                                                        onChange = {handleChange}
-                                                    />
-
-                                                    <div className="mb-3">
-                                                        <label for="coverletter" className="form-label fw-bold text-uppercase">Cover Letter</label>
-                                                        <textarea
-                                                            className="form-control"
-                                                            id="coverletter"
-                                                            name = "coverletter"
-                                                            placeholder = "Mention in detail what skill or past experience you have for this internship. What excites you about this internship? Why would you be a good fit?"
-                                                            rows="5"
-                                                            value = {`${application.coverletter}`}
-                                                            onChange = {(event) => {
-                                                                handleChange(event.target.name, event.target.value)
-                                                            }}
-                                                        ></textarea>
-                                                    </div>
-
-                                                    <div className="mb-3">
-                                                        <label for="resume" className="form-label fw-bold text-uppercase">Resume/CV</label>
-                                                        <input 
-                                                            type = "file" 
-                                                            className = "form-control" 
-                                                            id = "resume" 
-                                                            name = "resume" 
-                                                            multiple 
-                                                            ref = {fileInput}  
-                                                            onChange={(event) => {
-                                                                handleChange(event.target.name, event.target.files[0])
-                                                            }}    
+                                                    <p className = "login-success-message text-center hidden accept-message">Application submitted successfully!</p>
+                                                    <p className = "login-error-message text-center hidden reject-message">Error submitting application. Please try again.</p>
+                                                    <form>
+                                                        <FormElement 
+                                                            labelFor = "fullName"
+                                                            labelTitle = "Full Name"
+                                                            type = "text"
+                                                            id = "fullName"
+                                                            placeholder = "Full Name"
+                                                            name = "fullName"
+                                                            value = {application.fullName}
+                                                            onChange = {handleChange}
                                                         />
-                                                    </div>
-                                                </form>
+
+                                                        <FormElement 
+                                                            labelFor = "email"
+                                                            labelTitle = "Email"
+                                                            type = "email"
+                                                            id = "email"
+                                                            placeholder = "Email"
+                                                            name = "email"
+                                                            value = {application.email}
+                                                            onChange = {handleChange}
+                                                        />
+
+                                                        <FormElement
+                                                            labelFor = "phone"
+                                                            labelTitle = "Phone"
+                                                            type = "tel"
+                                                            id = "phone"
+                                                            placeholder = "Phone"
+                                                            name = "phone"
+                                                            value = {application.phone}
+                                                            onChange = {handleChange}
+                                                        />
+
+                                                        <div className="mb-3">
+                                                            <label for="coverletter" className="form-label fw-bold text-uppercase">Cover Letter</label>
+                                                            <textarea
+                                                                className="form-control"
+                                                                id="coverletter"
+                                                                name = "coverletter"
+                                                                placeholder = "Mention in detail what skill or past experience you have for this internship. What excites you about this internship? Why would you be a good fit?"
+                                                                rows="5"
+                                                                value = {`${application.coverletter}`}
+                                                                onChange = {(event) => {
+                                                                    handleChange(event.target.name, event.target.value)
+                                                                }}
+                                                            ></textarea>
+                                                        </div>
+
+                                                        <div className="mb-3">
+                                                            <label for="resume" className="form-label fw-bold text-uppercase">Resume/CV</label>
+                                                            <input 
+                                                                type = "file" 
+                                                                className = "form-control" 
+                                                                id = "resume" 
+                                                                name = "resume"
+                                                                ref = {fileInput}  
+                                                                onChange={(event) => {
+                                                                    handleChange(event.target.name, event.target.files[0])
+                                                                }}    
+                                                            />
+                                                        </div>
+                                                    </form>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
